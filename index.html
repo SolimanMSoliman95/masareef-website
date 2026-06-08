@@ -422,8 +422,8 @@
         <div class="inline-grid place-items-center w-14 h-14 rounded-2xl grad text-white shadow-soft mb-6">
           <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 4.5-3 8.3-7 9.5C8 19.3 5 15.5 5 11V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
         </div>
-        <h2 class="text-[28px] sm:text-[38px] font-extrabold tracking-[-0.02em] leading-tight text-ink dark:text-dink max-w-2xl mx-auto" data-i18n="priv_h">Encrypted on your phone. Never sold. Never shared.</h2>
-        <p class="mt-5 text-[16.5px] leading-relaxed text-muted dark:text-dmuted max-w-2xl mx-auto" data-i18n="priv_p">Your transactions live on your device, encrypted with SQLCipher. Our analytics is anonymous feature-usage only — we can't see what you spend, and we never sell your data to anyone.</p>
+        <h2 class="text-[28px] sm:text-[38px] font-extrabold tracking-[-0.02em] leading-tight text-ink dark:text-dink max-w-2xl mx-auto" data-i18n="priv_h">Encrypted on your phone. Backed up securely. Never sold.</h2>
+        <p class="mt-5 text-[16.5px] leading-relaxed text-muted dark:text-dmuted max-w-2xl mx-auto" data-i18n="priv_p">Your data is encrypted on your phone with SQLCipher and backed up to your own secure account. We process your bank SMS to turn them into transactions, and our analytics is anonymous — no amounts, no merchant names. And we never sell your data.</p>
         <a href="#/privacy" class="route-link inline-flex items-center gap-1.5 mt-7 h-11 px-6 rounded-full border hair text-[15px] font-semibold text-ink2 dark:text-dink hover:border-tealmid transition-colors" data-i18n="priv_link">Read the full Privacy Policy</a>
       </div>
     </div>
@@ -556,8 +556,8 @@ const I18N = {
     step1_h: 'Connect', step1_p: 'Add the SMS shortcut in two taps. No bank logins, no passwords, no account numbers — ever.',
     step2_h: 'Capture', step2_p: 'Every bank text turns into a clean, categorised transaction — automatically, in real time.',
     step3_h: 'Understand', step3_p: 'Budgets, trends and a chat that helps you make sense of it all — and stay on track.',
-    priv_h: 'Encrypted on your phone. Never sold. Never shared.',
-    priv_p: "Your transactions live on your device, encrypted with SQLCipher. Our analytics is anonymous feature-usage only — we can't see what you spend, and we never sell your data to anyone.",
+    priv_h: 'Encrypted on your phone. Backed up securely. Never sold.',
+    priv_p: "Your data is encrypted on your phone with SQLCipher and backed up to your own secure account. We process your bank SMS to turn them into transactions, and our analytics is anonymous — no amounts, no merchant names. And we never sell your data.",
     priv_link: 'Read the full Privacy Policy',
     faq_kicker: 'Questions', faq_h2: 'Good to know.',
     cta_h: 'Take control of your expenses.',
@@ -592,8 +592,8 @@ const I18N = {
     step1_h: 'وصّل', step1_p: 'ضيف اختصار الرسائل في ضغطتين. من غير تسجيل دخول للبنك، ولا باسوردات، ولا أرقام حسابات — أبداً.',
     step2_h: 'سجّل', step2_p: 'كل رسالة بنك بتتحوّل لعملية نضيفة ومصنّفة — تلقائي، في نفس اللحظة.',
     step3_h: 'افهم', step3_p: 'ميزانيات، واتجاهات، وشات بيساعدك تفهم كل ده — وتفضل ماشي صح.',
-    priv_h: 'مشفّر على موبايلك. مش بنبيعه. مش بنشاركه.',
-    priv_p: 'عملياتك بتعيش على جهازك، مشفّرة بـ SQLCipher. تحليلاتنا مجهولة وبتخص استخدام المميزات بس — إحنا مش شايفين إنت بتصرف على إيه، وعمرنا ما بنبيع بياناتك لحد.',
+    priv_h: 'مشفّر على موبايلك. متخزّن بأمان. عمرنا ما بنبيعه.',
+    priv_p: 'بياناتك مشفّرة على موبايلك بـ SQLCipher ومتخزّنة نسخة احتياطية في حسابك الآمن. بنحلّل رسائل البنك عشان نحوّلها لعمليات، وتحليلاتنا مجهولة — من غير مبالغ ولا أسماء تجار. وعمرنا ما بنبيع بياناتك.',
     priv_link: 'اقرا سياسة الخصوصية كاملة',
     faq_kicker: 'أسئلة', faq_h2: 'حلو إنك تعرف.',
     cta_h: 'اتحكّم في مصاريفك.',
@@ -748,8 +748,8 @@ function legalDoc(title, updated, sections) {
 const LEGAL = {
   privacy: {
     en: legalDoc('Privacy Policy', 'Last updated · 1 June 2026', [
-      ['1. Our promise', '<p>Masareef is built local-first. Your financial data is stored, encrypted, on your device. We designed the app so that we — the company — cannot see your individual transactions. This policy explains, in plain language, what we collect and what we never touch.</p>'],
-      ['2. What stays on your device', '<p>Bank SMS content, parsed transactions, budgets, categories and notes are stored in an encrypted SQLCipher database on your phone. This information is not transmitted to our servers in identifiable form.</p>'],
+      ['1. Our promise', '<p>Masareef is built local-first. Your financial data is stored, encrypted, on your device, and backed up to your own secure account so it syncs across your devices. We collect only what the app needs to work, share data only with the trusted providers listed in section 6, and never sell it. This policy explains, in plain language, what we collect and how it is handled.</p>'],
+      ['2. What stays on your device', '<p>Bank SMS content, parsed transactions, budgets, categories and notes are stored in an encrypted SQLCipher database on your phone, and backed up to your private account so you keep them across devices. To turn bank SMS into transactions, message content may be processed on our servers; the providers involved are listed in section 6.</p>'],
       ['3. What the AI sees', '<p>To power budgeting suggestions, the assistant receives only anonymised aggregates (for example, "dining: 32% of monthly spend"). It never receives raw SMS text or individual transaction records.</p>'],
       ['4. Analytics', '<p>We collect anonymous, feature-usage analytics (e.g. which screens are opened) to improve the product. This data cannot be linked back to your identity or your spending.</p>'],
       ['5. Data we never sell', '<p>We do not sell, rent, or share your personal or financial data with advertisers or data brokers. Ever.</p>'],
@@ -758,8 +758,8 @@ const LEGAL = {
       ['8. Contact', '<p>Questions about privacy? Email <a href="mailto:privacy@getmasareef.com">privacy@getmasareef.com</a> and we\'ll respond within 48 hours.</p>'],
     ]),
     ar: legalDoc('سياسة الخصوصية', 'آخر تحديث · ١ يونيو ٢٠٢٦', [
-      ['١. وعدنا', '<p>مصاريف مبني محلّياً أولاً. بياناتك المالية متخزّنة، مشفّرة، على جهازك. صمّمنا التطبيق بحيث إن الشركة نفسها مش قادرة تشوف عملياتك الفردية. السياسة دي بتشرح، بلغة بسيطة، إيه اللي بنجمعه وإيه اللي عمرنا ما بنلمسه.</p>'],
-      ['٢. اللي بيفضل على جهازك', '<p>محتوى رسائل البنك، العمليات، الميزانيات، الفئات والملاحظات متخزّنة في قاعدة بيانات مشفّرة بـ SQLCipher على موبايلك. المعلومات دي مش بتتبعت لخوادمنا بشكل يحدّد هويتك.</p>'],
+      ['١. وعدنا', '<p>مصاريف مبني محلّياً أولاً. بياناتك المالية متخزّنة، مشفّرة، على جهازك، وبتتاخد ليها نسخة احتياطية في حسابك الآمن عشان تتزامن بين أجهزتك. بنجمع اللي التطبيق محتاجه بس، وبنشارك البيانات مع مزوّدي الخدمة الموثوقين المذكورين في القسم ٦ بس، وعمرنا ما بنبيعها. السياسة دي بتشرح، بلغة بسيطة، إيه اللي بنجمعه وإزاي بيتعامل معاه.</p>'],
+      ['٢. اللي بيفضل على جهازك', '<p>محتوى رسائل البنك، العمليات، الميزانيات، الفئات والملاحظات متخزّنة في قاعدة بيانات مشفّرة بـ SQLCipher على موبايلك، وبتتاخد ليها نسخة احتياطية في حسابك الخاص عشان تفضل معاك على كل أجهزتك. وعشان نحوّل رسائل البنك لعمليات، ممكن محتوى الرسالة يتعالج على خوادمنا؛ ومزوّدي الخدمة المعنيين مذكورين في القسم ٦.</p>'],
       ['٣. اللي بيشوفه الذكاء الاصطناعي', '<p>عشان يقترح ميزانيات، المساعد بيستقبل أرقام مجمّعة مجهولة بس (مثلاً: «الأكل: ٣٢٪ من صرف الشهر»). عمره ما بيستقبل نص الرسائل الأصلي أو تفاصيل العمليات.</p>'],
       ['٤. التحليلات', '<p>بنجمع تحليلات استخدام مجهولة (مثلاً أنهي شاشات بتتفتح) عشان نحسّن المنتج. البيانات دي مينفعش تترجع لهويتك أو لصرفك.</p>'],
       ['٥. بيانات عمرنا ما بنبيعها', '<p>إحنا مش بنبيع أو نأجّر أو نشارك بياناتك الشخصية أو المالية مع معلنين أو وسطاء بيانات. أبداً.</p>'],
