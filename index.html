@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Masareef — Your money, finally in your language</title>
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+<link rel="apple-touch-icon" href="assets/masareef_app_icon.png" />
+<meta name="description" content="Masareef turns your bank SMS into a clear, private picture of your spending — and an AI that helps you actually budget. In Arabic and English." />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          teal: '#157C78',
+          tealmid: '#3FA6A2',
+          grn: '#57B078',
+          paper: '#F8F6F0',
+          ink: '#121917',
+          ink2: '#1F2926',
+          muted: '#60706C',
+          hair: '#E5DECB',
+          dbg: '#0E1413',
+          dcard: '#1A2220',
+          dink: '#F0EBD8',
+          dmuted: '#8A938F',
+          dhair: '#2A332F',
+          expense: '#D9584B',
+          income: '#57B078',
+          amber: '#D3952B',
+        },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          ar: ['"IBM Plex Sans Arabic"', 'Inter', 'sans-serif'],
+        },
+        borderRadius: { card: '18px', input: '12px' },
+        boxShadow: {
+          soft: '0 1px 2px rgba(18,25,23,.04), 0 8px 24px -8px rgba(18,25,23,.10)',
+          lift: '0 1px 2px rgba(18,25,23,.05), 0 24px 60px -20px rgba(18,25,23,.22)',
+          phone: '0 2px 6px rgba(18,25,23,.08), 0 40px 90px -30px rgba(18,25,23,.40)',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root { --grad: linear-gradient(135deg, #157C78 0%, #3FA6A2 52%, #57B078 100%); }
+  html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+  body { font-feature-settings: "cv05","ss01"; }
+  .num { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  .grad { background: var(--grad); }
+  .grad-text { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hair { border-color: #E5DECB; }
+  .dark .hair { border-color: #2A332F; }
+  /* dark-mode base (explicit — the Tailwind dark: variant on <body> was being out-cascaded) */
+  body { background-color:#F8F6F0; color:#121917; }
+  html.dark body { background-color:#0E1413; color:#F0EBD8; }
+  /* RTL font swap */
+  html[dir="rtl"] body { font-family: '"IBM Plex Sans Arabic"', Inter, sans-serif; }
+  html[dir="rtl"] .num { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; }
+  /* content visible by default; no entrance animation (preview context freezes them) */
+  .reveal { opacity: 1; }
+  /* hide elements by language */
+  html[dir="ltr"] .ar-only { display: none !important; }
+  html[dir="rtl"] .en-only { display: none !important; }
+  /* phone glow */
+  .glow::before { content:""; position:absolute; inset:-12% -8% -8% -8%; background: var(--grad); filter: blur(60px); opacity:.20; border-radius: 50%; z-index:0; }
+  .dark .glow::before { opacity:.28; }
+  ::selection { background: rgba(63,166,162,.25); }
+  /* faq */
+  .faq-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .faq-item[open] .faq-body { grid-template-rows: 1fr; }
+  .faq-item[open] .faq-chev { transform: rotate(45deg); }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  /* nav scrolled */
+  .nav-scrolled { backdrop-filter: saturate(180%) blur(14px); }
+
+  /* bank logo marquee */
+  .marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%); }
+  .marquee-track { display: flex; align-items: center; width: max-content; animation: marquee-slide 38s linear infinite; }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+  .marquee-item { flex-shrink: 0; padding-inline: 26px; }
+  @keyframes marquee-slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; flex-wrap: wrap; justify-content: center; row-gap: 1.25rem; } }
+
+  /* ===== PHONE FRAME ===== */
+  .phone { --abg:#F8F6F0; --acard:#FFFFFF; --aink:#121917; --amuted:#7A8884; --ahair:#ECE6D6;
+    position:relative; width:300px; height:614px; border-radius:46px; padding:11px;
+    background:#0d0f0f; box-shadow: 0 2px 6px rgba(18,25,23,.08), 0 40px 90px -30px rgba(18,25,23,.42), inset 0 0 0 2px #2b2e2e;
+  }
+  .dark .phone { box-shadow: 0 2px 6px rgba(0,0,0,.3), 0 40px 90px -28px rgba(0,0,0,.7), inset 0 0 0 2px #313635; }
+  .phone-dark { --abg:#0E1413; --acard:#1A2220; --aink:#F0EBD8; --amuted:#8A938F; --ahair:#2A332F; }
+  .phone-island { position:absolute; top:20px; left:50%; transform:translateX(-50%); width:96px; height:26px; background:#0d0f0f; border-radius:999px; z-index:20; }
+  .phone-screen { position:relative; width:100%; height:100%; border-radius:35px; overflow:hidden; background:var(--abg); color:var(--aink); display:flex; flex-direction:column; }
+  .st-bar { display:flex; align-items:center; justify-content:space-between; padding:14px 24px 6px; height:46px; flex-shrink:0; }
+  .st-time { font-size:14px; font-weight:600; color:var(--aink); }
+  .st-icons { display:flex; align-items:center; gap:5px; color:var(--aink); }
+  .phone-app { flex:1; overflow:hidden; padding:6px 16px 16px; display:flex; flex-direction:column; gap:12px; }
+
+  /* real screenshot fill + graceful placeholder */
+  .phone-shotwrap { position:relative; flex:1; overflow:hidden; background:var(--abg); }
+  .phone-screen img.phone-shot { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top center; z-index:5; }
+  .phone-ph { position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:11px; padding:24px; text-align:center;
+    background:repeating-linear-gradient(135deg, var(--abg) 0 12px, var(--acard) 12px 24px); }
+  .phone-ph .ph-tag { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11px; letter-spacing:.01em; background:var(--acard); border:1px solid var(--ahair); padding:6px 11px; border-radius:9px; color:var(--aink); }
+  .phone-ph .ph-cap { font-size:11px; color:var(--amuted); max-width:170px; line-height:1.45; }
+
+  /* app shared */
+  .app-top { display:flex; align-items:center; justify-content:space-between; }
+  .app-hi { font-size:19px; font-weight:800; letter-spacing:-.02em; color:var(--aink); }
+  .app-sub { font-size:12px; color:var(--amuted); margin-top:1px; }
+  .app-sub2 { font-size:12px; color:var(--amuted); font-weight:600; }
+  .app-av { width:34px; height:34px; border-radius:50%; background:var(--grad); color:#fff; font-weight:700; display:grid; place-items:center; font-size:14px; }
+  .sec-head { display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:700; color:var(--amuted); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
+  .sec-link { color:#3FA6A2; text-transform:none; letter-spacing:0; font-weight:600; }
+
+  /* home */
+  .balance-card { border-radius:20px; padding:16px 18px; color:#fff; box-shadow:0 10px 24px -10px rgba(21,124,120,.6); }
+  .bc-label { font-size:11.5px; opacity:.9; font-weight:500; }
+  .bc-amt { font-size:30px; font-weight:800; letter-spacing:-.02em; margin-top:2px; }
+  .bc-row { display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+  .bc-pill { font-size:11px; background:rgba(255,255,255,.22); padding:3px 9px; border-radius:999px; font-weight:600; }
+  .bc-cap { font-size:10.5px; opacity:.85; }
+  .sms-toast { display:flex; align-items:center; gap:8px; background:var(--acard); border:1px solid var(--ahair); border-radius:12px; padding:9px 11px; font-size:11px; color:var(--aink); box-shadow:0 4px 12px -6px rgba(18,25,23,.12); }
+  .sms-toast b { font-weight:700; }
+  .sms-dot { width:7px; height:7px; border-radius:50%; background:#57B078; flex-shrink:0; box-shadow:0 0 0 3px rgba(87,176,120,.18); }
+  .tx-list { display:flex; flex-direction:column; gap:3px; overflow:hidden; }
+  .tx { display:flex; align-items:center; gap:11px; padding:8px 4px; }
+  .tx-ic { width:32px; height:32px; border-radius:10px; display:grid; place-items:center; flex-shrink:0; }
+  .tx-mid { flex:1; min-width:0; }
+  .tx-name { font-size:13.5px; font-weight:600; color:var(--aink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tx-cat { font-size:11px; color:var(--amuted); margin-top:1px; }
+  .tx-amt { font-size:13.5px; font-weight:700; color:var(--aink); }
+
+  /* budgets */
+  .bud-list { display:flex; flex-direction:column; gap:14px; margin-top:2px; }
+  .bud-head { display:flex; align-items:center; gap:9px; margin-bottom:7px; }
+  .bud-ic { width:26px; height:26px; border-radius:8px; display:grid; place-items:center; flex-shrink:0; }
+  .bud-name { font-size:13px; font-weight:600; color:var(--aink); flex:1; }
+  .bud-fig { font-size:11.5px; color:var(--amuted); font-weight:600; }
+  .bud-bar { height:7px; border-radius:999px; background:var(--ahair); overflow:hidden; }
+  .bud-fill { height:100%; border-radius:999px; }
+  .chat { margin-top:auto; display:flex; flex-direction:column; gap:7px; }
+  .chat-ai { display:flex; gap:7px; align-items:flex-end; }
+  .chat-av { width:24px; height:24px; border-radius:50%; color:#fff; font-weight:700; display:grid; place-items:center; font-size:12px; flex-shrink:0; }
+  .chat-bub { background:var(--acard); border:1px solid var(--ahair); border-radius:14px; border-bottom-left-radius:4px; padding:8px 11px; font-size:12px; line-height:1.5; color:var(--aink); max-width:88%; }
+  .chat-me { display:flex; justify-content:flex-end; }
+  .chat-bub.me { background:var(--grad); color:#fff; border:none; border-radius:14px; border-bottom-right-radius:4px; }
+  .chat-input { display:flex; align-items:center; justify-content:space-between; background:var(--acard); border:1px solid var(--ahair); border-radius:999px; padding:7px 8px 7px 14px; font-size:12px; color:var(--amuted); }
+  .chat-send { width:26px; height:26px; border-radius:50%; color:#fff; display:grid; place-items:center; font-size:14px; }
+
+  /* insights */
+  .donut-card { display:flex; align-items:center; gap:16px; background:var(--acard); border:1px solid var(--ahair); border-radius:16px; padding:14px; }
+  .donut { width:96px; height:96px; border-radius:50%; flex-shrink:0; display:grid; place-items:center; }
+  .donut-hole { width:62px; height:62px; border-radius:50%; background:var(--acard); display:grid; place-items:center; }
+  .donut-amt { font-size:16px; font-weight:800; color:var(--aink); letter-spacing:-.02em; }
+  .donut-cap { font-size:9px; color:var(--amuted); margin-top:-2px; }
+  .legend { flex:1; display:flex; flex-direction:column; gap:7px; }
+  .leg { display:flex; align-items:center; gap:7px; font-size:11.5px; }
+  .leg-dot { width:8px; height:8px; border-radius:3px; }
+  .leg-n { color:var(--aink); font-weight:500; flex:1; }
+  .leg-p { color:var(--amuted); font-weight:700; }
+  .trend { display:flex; align-items:flex-end; gap:8px; height:70px; padding:4px 2px; }
+  .trend-bar { flex:1; background:var(--ahair); border-radius:5px 5px 3px 3px; min-height:8px; }
+  .salary-note { display:flex; align-items:center; gap:8px; background:var(--acard); border:1px solid var(--ahair); border-radius:12px; padding:9px 11px; font-size:11px; color:var(--aink); }
+  .salary-note b { font-weight:700; }
+  .sn-ic { font-size:14px; }
+
+  /* privacy screen */
+  .pv-hero { text-align:center; padding:10px 0 4px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .pv-shield { width:58px; height:58px; border-radius:18px; display:grid; place-items:center; box-shadow:0 10px 24px -10px rgba(21,124,120,.6); }
+  .pv-h { font-size:18px; font-weight:800; color:var(--aink); letter-spacing:-.02em; }
+  .pv-sub { font-size:12px; color:var(--amuted); max-width:200px; line-height:1.5; }
+  .pv-list { display:flex; flex-direction:column; gap:9px; margin-top:6px; }
+  .pv-row { display:flex; gap:11px; align-items:center; background:var(--acard); border:1px solid var(--ahair); border-radius:13px; padding:11px 13px; }
+  .pv-check { width:24px; height:24px; border-radius:7px; background:rgba(87,176,120,.15); color:#57B078; display:grid; place-items:center; font-weight:800; font-size:13px; flex-shrink:0; }
+  .pv-t { font-size:13px; font-weight:600; color:var(--aink); }
+  .pv-s { font-size:11px; color:var(--amuted); margin-top:1px; }
+  .pv-foot { margin-top:auto; text-align:center; font-size:11px; color:var(--amuted); font-weight:500; }
+
+  /* ===== LEGAL PROSE ===== */
+  .legal-h1 { font-size:38px; font-weight:800; letter-spacing:-.025em; line-height:1.1; }
+  .dark .legal-h1 { color:#F0EBD8; }
+  .legal-upd { font-size:14px; color:#60706C; margin-top:10px; margin-bottom:36px; }
+  .dark .legal-upd { color:#8A938F; }
+  .legal-h2 { font-size:21px; font-weight:700; letter-spacing:-.01em; margin-top:34px; margin-bottom:10px; }
+  .dark .legal-h2 { color:#F0EBD8; }
+  .legal-body { font-size:16px; line-height:1.7; color:#3a4744; }
+  .dark .legal-body { color:#b9c0bc; }
+  .legal-body a { color:#157C78; font-weight:600; text-decoration:underline; text-underline-offset:2px; }
+  .dark .legal-body a { color:#3FA6A2; }
+  .legal-body b { font-weight:700; color:#1F2926; }
+  .dark .legal-body b { color:#F0EBD8; }
+  .legal-body ul { list-style:none; margin:16px 0 6px; padding:0; display:flex; flex-direction:column; gap:9px; }
+  .legal-body li { position:relative; font-size:16px; line-height:1.6; color:#3a4744; padding-inline-start:20px; }
+  .dark .legal-body li { color:#b9c0bc; }
+  .legal-body li::before { content:""; position:absolute; inset-inline-start:2px; top:11px; width:6px; height:6px; border-radius:50%; background:#3FA6A2; }
+  /* processor list */
+  .proc-list { list-style:none; margin:18px 0 6px; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .proc-list li { border:1px solid #E5DECB; border-radius:14px; padding:13px 16px; background:#fff; }
+  .dark .proc-list li { border-color:#2A332F; background:#1A2220; }
+  .proc-list .proc-n { font-weight:700; color:#1F2926; font-size:15.5px; }
+  .dark .proc-list .proc-n { color:#F0EBD8; }
+  .proc-list .proc-d { display:block; margin-top:3px; font-size:14.5px; line-height:1.6; color:#3a4744; }
+  .dark .proc-list .proc-d { color:#b9c0bc; }
+  /* app-store download badges */
+  .store-badge { display:inline-flex; align-items:center; gap:11px; height:56px; padding:0 22px; border-radius:14px; background:#121917; color:#fff; box-shadow:0 8px 24px -12px rgba(18,25,23,.55); transition:transform .2s ease, box-shadow .2s ease; }
+  .store-badge:hover { transform:translateY(-2px); box-shadow:0 16px 34px -12px rgba(18,25,23,.6); }
+  .store-badge svg { width:26px; height:26px; flex-shrink:0; }
+  .store-badge .sb-txt { display:flex; flex-direction:column; line-height:1.12; text-align:start; }
+  .store-badge .sb-top { font-size:11px; font-weight:500; opacity:.82; letter-spacing:.01em; }
+  .store-badge .sb-name { font-size:18px; font-weight:600; letter-spacing:-.01em; }
+</style>
+</head>
+<body class="font-sans antialiased transition-colors duration-300">
+
+<!-- ============ NAV ============ -->
+<header id="nav" class="fixed top-0 inset-x-0 z-50 transition-all duration-300">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <div id="navbar" class="mt-3 flex items-center justify-between rounded-card border border-transparent px-4 sm:px-5 h-14 transition-all duration-300">
+      <!-- wordmark -->
+      <a href="#top" class="flex items-center gap-2.5 shrink-0" aria-label="Masareef home">
+        <img src="assets/masareef_app_icon.png" alt="" class="h-9 w-9 shrink-0" />
+        <span class="en-only text-[21px] font-extrabold tracking-[-0.03em] text-ink leading-none">Masareef</span>
+        <span class="ar-only font-ar text-[23px] font-bold text-ink leading-none">مصاريف</span>
+      </a>
+      <!-- links -->
+      <nav class="hidden lg:flex items-center gap-1 text-[14px] font-medium text-ink2 dark:text-dmuted">
+        <a class="px-3 py-2 rounded-full hover:text-teal dark:hover:text-tealmid transition-colors" href="#features" data-i18n="nav_features">Features</a>
+        <a class="px-3 py-2 rounded-full hover:text-teal dark:hover:text-tealmid transition-colors" href="#how" data-i18n="nav_how">How it works</a>
+        <a class="px-3 py-2 rounded-full hover:text-teal dark:hover:text-tealmid transition-colors" href="#privacy" data-i18n="nav_privacy">Privacy</a>
+        <a class="px-3 py-2 rounded-full hover:text-teal dark:hover:text-tealmid transition-colors" href="#faq" data-i18n="nav_faq">FAQ</a>
+      </nav>
+      <!-- actions -->
+      <div class="flex items-center gap-1.5">
+        <button id="langToggle" class="h-9 px-3 rounded-full border hair text-[13px] font-semibold text-ink2 hover:border-tealmid transition-colors flex items-center gap-1.5" aria-label="Switch language">
+          <span class="en-only">العربية</span>
+          <span class="ar-only">EN</span>
+        </button>
+        <a href="#download" class="hidden sm:inline-flex h-9 px-4 items-center whitespace-nowrap rounded-full grad text-white text-[13.5px] font-semibold shadow-soft hover:opacity-95 hover:shadow-lift transition-all" data-i18n="nav_cta">Get the app</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LANDING (router view) ============ -->
+<main id="view-home">
+<a id="top"></a>
+
+<!-- ===== HERO ===== -->
+<section class="relative overflow-hidden pt-32 sm:pt-36 pb-16 sm:pb-24">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-12 lg:gap-8 items-center">
+      <!-- copy -->
+      <div class="reveal text-center lg:text-start ltr:lg:text-left rtl:lg:text-right">
+        <div class="inline-flex items-center gap-2 rounded-full border hair px-3 py-1.5 text-[12.5px] font-medium text-muted dark:text-dmuted mb-6">
+          <span class="w-1.5 h-1.5 rounded-full grad"></span>
+          <span data-i18n="hero_pill">Built for Egypt</span>
+        </div>
+        <h1 class="text-[40px] leading-[1.05] sm:text-[56px] lg:text-[62px] font-extrabold tracking-[-0.03em] text-ink dark:text-dink" data-i18n="hero_h1">Your money, finally in your language.</h1>
+        <p class="mt-6 text-[17px] sm:text-[19px] leading-relaxed text-muted dark:text-dmuted max-w-xl mx-auto lg:mx-0" data-i18n="hero_sub">Masareef turns your bank SMS into a clear, private picture of your spending — and an AI that helps you actually budget. In Arabic and English.</p>
+        <div class="mt-8 flex flex-col sm:flex-row items-center lg:items-start gap-3 justify-center lg:justify-start">
+          <a href="#download" class="w-full sm:w-auto h-12 px-7 inline-flex items-center justify-center rounded-full grad text-white text-[15px] font-semibold shadow-lift hover:opacity-95 transition-all" data-i18n="hero_cta">Get the app</a>
+          <a href="#how" class="w-full sm:w-auto h-12 px-6 inline-flex items-center justify-center gap-2 rounded-full border hair text-[15px] font-semibold text-ink2 dark:text-dink hover:border-tealmid transition-colors" data-i18n="hero_cta2">See how it works</a>
+        </div>
+        <div class="mt-7 flex flex-wrap items-center gap-3 justify-center lg:justify-start">
+          <a href="#" class="store-badge" aria-label="Download on the App Store">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04a4.27 4.27 0 0 1 2.04-3.58 4.38 4.38 0 0 0-3.45-1.87c-1.46-.15-2.86.86-3.6.86-.74 0-1.89-.84-3.11-.82a4.6 4.6 0 0 0-3.87 2.36c-1.66 2.88-.42 7.14 1.18 9.48.79 1.14 1.72 2.42 2.94 2.38 1.18-.05 1.63-.76 3.06-.76 1.42 0 1.83.76 3.07.74 1.27-.02 2.07-1.16 2.85-2.31a9.4 9.4 0 0 0 1.29-2.65 4.13 4.13 0 0 1-2.4-3.56zM14.7 5.2a4.2 4.2 0 0 0 .96-3.01 4.27 4.27 0 0 0-2.77 1.43 3.99 3.99 0 0 0-.99 2.9 3.53 3.53 0 0 0 2.8-1.32z"/></svg>
+            <span class="sb-txt"><span class="sb-top" data-i18n="store_ios_top">Download on the</span><span class="sb-name">App Store</span></span>
+          </a>
+          <a href="#" class="store-badge" aria-label="Get it on Google Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.2 2.6c-.5-.3-1.2.05-1.2.66v17.48c0 .61.7.96 1.2.66l9.02-5.34-2.7-2.72L5.2 2.6zm10.78 6.36L7.4 3.86l6.92 6.96 1.66-1.86zM7.4 20.14l8.58-5.1-1.66-1.86-6.92 6.96zM18.9 10.9l-2.06-1.22-1.9 2.32 1.9 2.32 2.06-1.22c.74-.44.74-1.76 0-2.2z"/></svg>
+            <span class="sb-txt"><span class="sb-top" data-i18n="store_and_top">GET IT ON</span><span class="sb-name">Google Play</span></span>
+          </a>
+        </div>
+      </div>
+      <!-- phone -->
+      <div class="reveal relative flex justify-center lg:justify-end">
+        <div class="glow relative">
+          <div id="phone-hero" class="relative z-10"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BANK STRIP ===== -->
+<section class="py-10 border-y hair overflow-hidden">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <p class="text-center text-[13px] font-medium text-muted mb-7" data-i18n="banks_caption">Reads SMS from 30+ Egyptian banks &amp; wallets.</p>
+  </div>
+  <div class="marquee" dir="ltr">
+    <div class="marquee-track opacity-70">
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2">NBE</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2">CIB</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2">QNB</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2">Banque&nbsp;Misr</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2">HSBC</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2">AlexBank</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2">Vodafone&nbsp;Cash</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2">InstaPay</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2">Fawry</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2">Meeza</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2">Orange&nbsp;Cash</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2">Etisalat&nbsp;Cash</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2" aria-hidden="true">NBE</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2" aria-hidden="true">CIB</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2" aria-hidden="true">QNB</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2" aria-hidden="true">Banque&nbsp;Misr</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2" aria-hidden="true">HSBC</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2" aria-hidden="true">AlexBank</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2" aria-hidden="true">Vodafone&nbsp;Cash</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2" aria-hidden="true">InstaPay</span>
+      <span class="marquee-item text-[17px] font-bold tracking-tight text-ink2" aria-hidden="true">Fawry</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2" aria-hidden="true">Meeza</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2" aria-hidden="true">Orange&nbsp;Cash</span>
+      <span class="marquee-item text-[17px] font-semibold tracking-tight text-ink2" aria-hidden="true">Etisalat&nbsp;Cash</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features" class="py-20 sm:py-28">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <div class="reveal max-w-2xl mb-16 sm:mb-20">
+      <p class="text-[13px] font-semibold uppercase tracking-[0.14em] grad-text mb-3" data-i18n="feat_kicker">Everything in one place</p>
+      <h2 class="text-[32px] sm:text-[44px] font-extrabold tracking-[-0.025em] leading-[1.08] text-ink dark:text-dink" data-i18n="feat_h2">A finance app that does the typing for you.</h2>
+    </div>
+
+    <!-- row a -->
+    <div class="feature-row grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-24 sm:mb-32">
+      <div class="reveal order-2 lg:order-1">
+        <div class="inline-flex items-center gap-2 text-[13px] font-semibold text-teal dark:text-tealmid mb-4"><span class="num">01</span><span data-i18n="fa_tag">Automatic capture</span></div>
+        <h3 class="text-[26px] sm:text-[32px] font-bold tracking-tight leading-tight text-ink dark:text-dink" data-i18n="fa_h">Bank SMS becomes transactions. No typing.</h3>
+        <p class="mt-4 text-[16.5px] leading-relaxed text-muted dark:text-dmuted max-w-md" data-i18n="fa_p">The moment your bank texts you, Masareef reads it, categorises it, and files it. Merchant, amount, category — sorted before you even open the app. You just live your life.</p>
+      </div>
+      <div class="reveal order-1 lg:order-2 flex justify-center"><div class="phone-slot" data-shot="uploads/home_en.png" data-label="Home · transactions captured from SMS"></div></div>
+    </div>
+
+    <!-- row b (reversed) -->
+    <div class="feature-row grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-24 sm:mb-32">
+      <div class="reveal flex justify-center"><div class="phone-slot" data-shot="uploads/budgets_en.png" data-label="Budgets · AI money-buddy chat"></div></div>
+      <div class="reveal">
+        <div class="inline-flex items-center gap-2 text-[13px] font-semibold text-teal dark:text-tealmid mb-4"><span class="num">02</span><span data-i18n="fb_tag">AI budgeting</span></div>
+        <h3 class="text-[26px] sm:text-[32px] font-bold tracking-tight leading-tight text-ink dark:text-dink" data-i18n="fb_h">A money-buddy that actually helps — and roasts you a little.</h3>
+        <p class="mt-4 text-[16.5px] leading-relaxed text-muted dark:text-dmuted max-w-md" data-i18n="fb_p">Chat in Egyptian Arabic or English. Masareef builds a real budget from how you actually spend, nudges you before you overspend, and isn't afraid to call out that third coffee. Friendly, never preachy.</p>
+      </div>
+    </div>
+
+    <!-- row c -->
+    <div class="feature-row grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-24 sm:mb-32">
+      <div class="reveal order-2 lg:order-1">
+        <div class="inline-flex items-center gap-2 text-[13px] font-semibold text-teal dark:text-tealmid mb-4"><span class="num">03</span><span data-i18n="fc_tag">Insights</span></div>
+        <h3 class="text-[26px] sm:text-[32px] font-bold tracking-tight leading-tight text-ink dark:text-dink" data-i18n="fc_h">Insights that make sense for how Egypt gets paid.</h3>
+        <p class="mt-4 text-[16.5px] leading-relaxed text-muted dark:text-dmuted max-w-md" data-i18n="fc_p">Spending by category, month-over-month trends, and a view that understands the salary cycle — so the end of the month never sneaks up on you again.</p>
+      </div>
+      <div class="reveal order-1 lg:order-2 flex justify-center"><div class="phone-slot" data-shot="uploads/insights_full_en.png" data-label="Insights · spending by category"></div></div>
+    </div>
+
+    <!-- row d : bills & subscriptions -->
+    <div class="feature-row grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-24 sm:mb-32">
+      <div class="reveal flex justify-center order-1"><div class="phone-slot" data-shot="uploads/bills_en.png" data-label="Bills & subscriptions · upcoming renewals"></div></div>
+      <div class="reveal order-2">
+        <div class="inline-flex items-center gap-2 text-[13px] font-semibold text-teal dark:text-tealmid mb-4"><span class="num">04</span><span data-i18n="fd_tag">Bills &amp; subscriptions</span></div>
+        <h3 class="text-[26px] sm:text-[32px] font-bold tracking-tight leading-tight text-ink dark:text-dink" data-i18n="fd_h">Never get surprised by a renewal again.</h3>
+        <p class="mt-4 text-[16.5px] leading-relaxed text-muted dark:text-dmuted max-w-md" data-i18n="fd_p">Masareef spots your recurring bills and subscriptions in your SMS — electricity, mobile, streaming, the gym — and reminds you before they hit. See what renews, when, and for how much.</p>
+      </div>
+    </div>
+
+    <!-- row e : transfers / instapay -->
+    <div class="feature-row grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <div class="reveal order-2 lg:order-1">
+        <div class="inline-flex items-center gap-2 text-[13px] font-semibold text-teal dark:text-tealmid mb-4"><span class="num">05</span><span data-i18n="fe_tag">Transfers &amp; InstaPay</span></div>
+        <h3 class="text-[26px] sm:text-[32px] font-bold tracking-tight leading-tight text-ink dark:text-dink" data-i18n="fe_h">Every transfer, InstaPay and wallet — one timeline.</h3>
+        <p class="mt-4 text-[16.5px] leading-relaxed text-muted dark:text-dmuted max-w-md" data-i18n="fe_p">Vodafone Cash, InstaPay, bank transfers and Fawry all land in the same clean feed. Money in, money out, who and when — finally in one place you can actually read.</p>
+        <a href="#privacy" class="inline-flex items-center gap-1.5 mt-5 text-[15px] font-semibold text-teal dark:text-tealmid hover:gap-2.5 transition-all" data-i18n="fe_link">See how your data stays private →</a>
+      </div>
+      <div class="reveal order-1 lg:order-2 flex justify-center"><div class="phone-slot" data-shot="uploads/instapay_en.png" data-label="Transfers · InstaPay & wallets"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how" class="py-20 sm:py-28 bg-white/50 dark:bg-dcard/30 border-y hair">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8">
+    <div class="reveal text-center max-w-2xl mx-auto mb-14 sm:mb-20">
+      <p class="text-[13px] font-semibold uppercase tracking-[0.14em] grad-text mb-3" data-i18n="how_kicker">How it works</p>
+      <h2 class="text-[32px] sm:text-[44px] font-extrabold tracking-[-0.025em] leading-[1.08] text-ink dark:text-dink" data-i18n="how_h2">Set up once. It runs by itself.</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
+      <div class="reveal relative rounded-card border hair bg-white dark:bg-dcard p-7 shadow-soft">
+        <span class="num grad-text text-[44px] font-extrabold leading-none">1</span>
+        <h3 class="mt-4 text-[20px] font-bold text-ink dark:text-dink" data-i18n="step1_h">Connect</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-muted dark:text-dmuted" data-i18n="step1_p">Add the SMS shortcut in two taps. No bank logins, no passwords, no account numbers — ever.</p>
+      </div>
+      <div class="reveal relative rounded-card border hair bg-white dark:bg-dcard p-7 shadow-soft">
+        <span class="num grad-text text-[44px] font-extrabold leading-none">2</span>
+        <h3 class="mt-4 text-[20px] font-bold text-ink dark:text-dink" data-i18n="step2_h">Capture</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-muted dark:text-dmuted" data-i18n="step2_p">Every bank text turns into a clean, categorised transaction — automatically, in real time.</p>
+      </div>
+      <div class="reveal relative rounded-card border hair bg-white dark:bg-dcard p-7 shadow-soft">
+        <span class="num grad-text text-[44px] font-extrabold leading-none">3</span>
+        <h3 class="mt-4 text-[20px] font-bold text-ink dark:text-dink" data-i18n="step3_h">Understand</h3>
+        <p class="mt-2 text-[15px] leading-relaxed text-muted dark:text-dmuted" data-i18n="step3_p">Budgets, trends and a chat that helps you make sense of it all — and stay on track.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRIVACY BAND ===== -->
+<section id="privacy" class="py-20 sm:py-28">
+  <div class="mx-auto max-w-5xl px-5 sm:px-8">
+    <div class="reveal relative overflow-hidden rounded-[28px] border hair bg-white dark:bg-dcard shadow-lift p-9 sm:p-14 text-center">
+      <div class="absolute -top-24 ltr:-right-24 rtl:-left-24 w-72 h-72 grad rounded-full blur-3xl opacity-[0.12]"></div>
+      <div class="relative">
+        <div class="inline-grid place-items-center w-14 h-14 rounded-2xl grad text-white shadow-soft mb-6">
+          <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 4.5-3 8.3-7 9.5C8 19.3 5 15.5 5 11V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h2 class="text-[28px] sm:text-[38px] font-extrabold tracking-[-0.02em] leading-tight text-ink dark:text-dink max-w-2xl mx-auto" data-i18n="priv_h">Encrypted on your phone. Never sold. Never shared.</h2>
+        <p class="mt-5 text-[16.5px] leading-relaxed text-muted dark:text-dmuted max-w-2xl mx-auto" data-i18n="priv_p">Your transactions live on your device, encrypted with SQLCipher. Our analytics is anonymous feature-usage only — we can't see what you spend, and we never sell your data to anyone.</p>
+        <a href="#/privacy" class="route-link inline-flex items-center gap-1.5 mt-7 h-11 px-6 rounded-full border hair text-[15px] font-semibold text-ink2 dark:text-dink hover:border-tealmid transition-colors" data-i18n="priv_link">Read the full Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq" class="py-20 sm:py-28 bg-white/50 dark:bg-dcard/30 border-y hair">
+  <div class="mx-auto max-w-3xl px-5 sm:px-8">
+    <div class="reveal text-center mb-12 sm:mb-16">
+      <p class="text-[13px] font-semibold uppercase tracking-[0.14em] grad-text mb-3" data-i18n="faq_kicker">Questions</p>
+      <h2 class="text-[32px] sm:text-[44px] font-extrabold tracking-[-0.025em] leading-[1.08] text-ink dark:text-dink" data-i18n="faq_h2">Good to know.</h2>
+    </div>
+    <div id="faqList" class="reveal space-y-3"></div>
+  </div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
+<section id="download" class="py-20 sm:py-28">
+  <div class="mx-auto max-w-6xl px-5 sm:px-8">
+    <div class="reveal relative overflow-hidden rounded-[32px] grad shadow-lift px-7 py-16 sm:p-20 text-center">
+      <div class="absolute inset-0 opacity-20 mix-blend-overlay" style="background-image:radial-gradient(circle at 20% 20%, white 0, transparent 40%), radial-gradient(circle at 80% 80%, white 0, transparent 40%);"></div>
+      <div class="relative">
+        <h2 class="text-[34px] sm:text-[52px] font-extrabold tracking-[-0.03em] leading-[1.05] text-white max-w-2xl mx-auto" data-i18n="cta_h" data-comment-anchor="5c7827ad2e-h2">Take control of your expenses.</h2>
+        <p class="mt-5 text-[17px] sm:text-[19px] leading-relaxed text-white/90 max-w-xl mx-auto" data-i18n="cta_p">Free to start. Private from day one. In the language you actually think in.</p>
+        <div class="mt-9 flex flex-col sm:flex-row gap-3.5 justify-center items-center">
+          <a href="#" class="store-badge" data-comment-anchor="13a4e1c962-a" aria-label="Download on the App Store">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04a4.27 4.27 0 0 1 2.04-3.58 4.38 4.38 0 0 0-3.45-1.87c-1.46-.15-2.86.86-3.6.86-.74 0-1.89-.84-3.11-.82a4.6 4.6 0 0 0-3.87 2.36c-1.66 2.88-.42 7.14 1.18 9.48.79 1.14 1.72 2.42 2.94 2.38 1.18-.05 1.63-.76 3.06-.76 1.42 0 1.83.76 3.07.74 1.27-.02 2.07-1.16 2.85-2.31a9.4 9.4 0 0 0 1.29-2.65 4.13 4.13 0 0 1-2.4-3.56zM14.7 5.2a4.2 4.2 0 0 0 .96-3.01 4.27 4.27 0 0 0-2.77 1.43 3.99 3.99 0 0 0-.99 2.9 3.53 3.53 0 0 0 2.8-1.32z"/></svg>
+            <span class="sb-txt"><span class="sb-top" data-i18n="store_ios_top">Download on the</span><span class="sb-name">App Store</span></span>
+          </a>
+          <a href="#" class="store-badge" data-comment-anchor="7c31cda5d3-span" aria-label="Get it on Google Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.2 2.6c-.5-.3-1.2.05-1.2.66v17.48c0 .61.7.96 1.2.66l9.02-5.34-2.7-2.72L5.2 2.6zm10.78 6.36L7.4 3.86l6.92 6.96 1.66-1.86zM7.4 20.14l8.58-5.1-1.66-1.86-6.92 6.96zM18.9 10.9l-2.06-1.22-1.9 2.32 1.9 2.32 2.06-1.22c.74-.44.74-1.76 0-2.2z"/></svg>
+            <span class="sb-txt"><span class="sb-top" data-i18n="store_and_top">GET IT ON</span><span class="sb-name">Google Play</span></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ LEGAL ROUTER VIEWS ============ -->
+<main id="view-legal" class="hidden pt-28 pb-24">
+  <div class="mx-auto max-w-3xl px-5 sm:px-8">
+    <a href="#top" class="route-home inline-flex items-center gap-1.5 text-[14px] font-semibold text-teal dark:text-tealmid mb-8 hover:gap-2.5 transition-all">
+      <span class="en-only">← Back to home</span><span class="ar-only">→ الرجوع للرئيسية</span>
+    </a>
+    <div id="legalContent" class="legal-prose"></div>
+  </div>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="border-t hair bg-white/50 dark:bg-dcard/30">
+  <div class="mx-auto max-w-7xl px-5 sm:px-8 py-14">
+    <div class="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div>
+        <a href="#top" class="inline-flex items-center gap-2.5 mb-4" aria-label="Masareef home">
+          <img src="assets/masareef_app_icon.png" alt="" class="h-9 w-9 shrink-0" />
+          <span class="en-only text-[20px] font-extrabold tracking-[-0.03em] text-ink leading-none">Masareef</span>
+          <span class="ar-only font-ar text-[22px] font-bold text-ink leading-none">مصاريف</span>
+        </a>
+        <p class="text-[14px] leading-relaxed text-muted dark:text-dmuted max-w-xs" data-i18n="foot_tag">Your bank SMS, turned into a clear and private picture of your money. Built in Egypt, in Arabic and English.</p>
+      </div>
+      <div>
+        <h4 class="text-[12px] font-bold uppercase tracking-wider text-muted dark:text-dmuted mb-4" data-i18n="foot_product">Product</h4>
+        <ul class="space-y-2.5 text-[14.5px] text-ink2 dark:text-dink">
+          <li><a href="#features" class="hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="nav_features">Features</a></li>
+          <li><a href="#how" class="hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="nav_how">How it works</a></li>
+          <li><a href="#faq" class="hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="nav_faq">FAQ</a></li>
+          <li><a href="#download" class="hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="nav_cta">Get the app</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-[12px] font-bold uppercase tracking-wider text-muted dark:text-dmuted mb-4" data-i18n="foot_company">Company</h4>
+        <ul class="space-y-2.5 text-[14.5px] text-ink2 dark:text-dink">
+          <li><a href="#privacy" class="hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="nav_privacy">Privacy</a></li>
+          <li><a href="#/support" class="route-link hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="foot_support">Support</a></li>
+          <li><a href="mailto:hello@masareef.app" class="hover:text-teal dark:hover:text-tealmid transition-colors">hello@masareef.app</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-[12px] font-bold uppercase tracking-wider text-muted dark:text-dmuted mb-4" data-i18n="foot_legal">Legal</h4>
+        <ul class="space-y-2.5 text-[14.5px] text-ink2 dark:text-dink">
+          <li><a href="#/privacy" class="route-link hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="foot_privacy">Privacy Policy</a></li>
+          <li><a href="#/terms" class="route-link hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="foot_terms">Terms of Use</a></li>
+          <li><a href="#/support" class="route-link hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="foot_support">Support</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-12 pt-7 border-t hair flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-[13px] text-muted dark:text-dmuted num">© 2026 Masareef · <span data-i18n="foot_rights">All rights reserved</span></p>
+      <div class="flex items-center gap-2">
+        <button class="langToggle h-8 px-3 rounded-full border hair text-[12.5px] font-semibold text-ink2 hover:border-tealmid transition-colors">
+          <span class="en-only">العربية</span><span class="ar-only">EN</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   MASAREEF — site logic: i18n, app mockups, router, toggles
+   ============================================================ */
+
+/* ---------- 1. TRANSLATIONS ---------- */
+const I18N = {
+  en: {
+    nav_features: 'Features', nav_how: 'How it works', nav_privacy: 'Privacy', nav_faq: 'FAQ', nav_cta: 'Get the app',
+    hero_pill: 'Built for Egypt',
+    hero_h1: 'Your money, finally in your language.',
+    hero_sub: 'Masareef turns your bank SMS into a clear, private picture of your spending — and an AI that helps you actually budget. In Arabic and English.',
+    hero_cta: 'Get the app', hero_cta2: 'See how it works', badge_top: 'Coming soon on',
+    banks_caption: 'Reads SMS from 30+ Egyptian banks & wallets.',
+    feat_kicker: 'Everything in one place',
+    feat_h2: 'A finance app that does the typing for you.',
+    fa_tag: 'Automatic capture', fa_h: 'Bank SMS becomes transactions. No typing.',
+    fa_p: 'The moment your bank texts you, Masareef reads it, categorises it, and files it. Merchant, amount, category — sorted before you even open the app. You just live your life.',
+    fb_tag: 'AI budgeting', fb_h: 'A money-buddy that actually helps — and roasts you a little.',
+    fb_p: "Chat in Egyptian Arabic or English. Masareef builds a real budget from how you actually spend, nudges you before you overspend, and isn't afraid to call out that third coffee. Friendly, never preachy.",
+    fc_tag: 'Insights', fc_h: 'Insights that make sense for how Egypt gets paid.',
+    fc_p: 'Spending by category, month-over-month trends, and a view that understands the salary cycle — so the end of the month never sneaks up on you again.',
+    fd_tag: 'Bills & subscriptions', fd_h: 'Never get surprised by a renewal again.',
+    fd_p: 'Masareef spots your recurring bills and subscriptions in your SMS — electricity, mobile, streaming, the gym — and reminds you before they hit. See what renews, when, and for how much.',
+    fe_tag: 'Transfers & InstaPay', fe_h: 'Every transfer, InstaPay and wallet — one timeline.',
+    fe_p: 'Vodafone Cash, InstaPay, bank transfers and Fawry all land in the same clean feed. Money in, money out, who and when — finally in one place you can actually read.',
+    fe_link: 'See how your data stays private →',
+    how_kicker: 'How it works', how_h2: 'Set up once. It runs by itself.',
+    step1_h: 'Connect', step1_p: 'Add the SMS shortcut in two taps. No bank logins, no passwords, no account numbers — ever.',
+    step2_h: 'Capture', step2_p: 'Every bank text turns into a clean, categorised transaction — automatically, in real time.',
+    step3_h: 'Understand', step3_p: 'Budgets, trends and a chat that helps you make sense of it all — and stay on track.',
+    priv_h: 'Encrypted on your phone. Never sold. Never shared.',
+    priv_p: "Your transactions live on your device, encrypted with SQLCipher. Our analytics is anonymous feature-usage only — we can't see what you spend, and we never sell your data to anyone.",
+    priv_link: 'Read the full Privacy Policy',
+    faq_kicker: 'Questions', faq_h2: 'Good to know.',
+    cta_h: 'Take control of your expenses.',
+    cta_p: 'Free to start. Private from day one. In the language you actually think in.',
+    cta_btn: 'Get the app', cta_note: 'iOS · Android coming soon',
+    store_ios_top: 'Download on the', store_and_top: 'GET IT ON',
+    foot_tag: 'Your bank SMS, turned into a clear and private picture of your money. Built in Egypt, in Arabic and English.',
+    foot_product: 'Product', foot_company: 'Company', foot_legal: 'Legal',
+    foot_support: 'Support', foot_privacy: 'Privacy Policy', foot_terms: 'Terms of Use', foot_rights: 'All rights reserved',
+  },
+  ar: {
+    nav_features: 'المميزات', nav_how: 'إزاي بيشتغل', nav_privacy: 'الخصوصية', nav_faq: 'الأسئلة', nav_cta: 'حمّل التطبيق',
+    hero_pill: 'مصمّم لمصر',
+    hero_h1: 'فلوسك، أخيراً بلغتك.',
+    hero_sub: 'مصاريف بيحوّل رسائل البنك لصورة واضحة وآمنة لمصاريفك، ومعاه مساعد ذكي بيساعدك تظبط ميزانيتك — بالعربي والإنجليزي.',
+    hero_cta: 'حمّل التطبيق', hero_cta2: 'شوف بيشتغل إزاي', badge_top: 'قريباً على',
+    banks_caption: 'بيقرا رسائل أكتر من ٣٠ بنك ومحفظة مصرية.',
+    feat_kicker: 'كل حاجة في مكان واحد',
+    feat_h2: 'تطبيق مصاريف بيكتب بدالك.',
+    fa_tag: 'تسجيل تلقائي', fa_h: 'رسالة البنك بتتحوّل لعملية. من غير ما تكتب.',
+    fa_p: 'أول ما البنك يبعتلك رسالة، مصاريف بيقراها، بيصنّفها، وبيسجّلها. المحل، المبلغ، الفئة — كله متظبّط قبل ما تفتح التطبيق أصلاً. إنت بس عيش حياتك.',
+    fb_tag: 'ميزانية بالذكاء الاصطناعي', fb_h: 'صاحب بيفهم في الفلوس — وبيتريق عليك شوية.',
+    fb_p: 'اتكلم بالعامية المصرية أو الإنجليزي. مصاريف بيعملك ميزانية حقيقية من صرفك الفعلي، بينبّهك قبل ما تتعدّى، ومش هيسكت على القهوة التالتة. لطيف، من غير وعظ.',
+    fc_tag: 'تحليلات', fc_h: 'تحليلات بتفهم نظام المرتبات في مصر.',
+    fc_p: 'الصرف حسب الفئة، ومقارنة شهر بشهر، وعرض بيفهم دورة المرتب — عشان آخر الشهر ميجيش عليك فجأة تاني.',
+    fd_tag: 'الفواتير والاشتراكات', fd_h: 'متتفاجئش بأي تجديد تاني.',
+    fd_p: 'مصاريف بيكتشف فواتيرك واشتراكاتك المتكررة من الرسائل — الكهربا، الموبايل، الاشتراكات، الجيم — وبيفكّرك قبل ما تتخصم. تعرف إيه اللي هيتجدّد، إمتى، وبكام.',
+    fe_tag: 'تحويلات وإنستاباي', fe_h: 'كل تحويل، إنستاباي ومحفظة — في خط زمني واحد.',
+    fe_p: 'فودافون كاش، إنستاباي، التحويلات البنكية وفوري كلهم بيظهروا في نفس الخط الزمني النضيف. فلوس داخلة، فلوس خارجة، مين وإمتى — أخيراً في مكان واحد تقدر تقراه.',
+    fe_link: 'شوف بياناتك بتفضل خاصة إزاي ←',
+    how_kicker: 'إزاي بيشتغل', how_h2: 'ظبّطه مرة. وبعدها بيشتغل لوحده.',
+    step1_h: 'وصّل', step1_p: 'ضيف اختصار الرسائل في ضغطتين. من غير تسجيل دخول للبنك، ولا باسوردات، ولا أرقام حسابات — أبداً.',
+    step2_h: 'سجّل', step2_p: 'كل رسالة بنك بتتحوّل لعملية نضيفة ومصنّفة — تلقائي، في نفس اللحظة.',
+    step3_h: 'افهم', step3_p: 'ميزانيات، واتجاهات، وشات بيساعدك تفهم كل ده — وتفضل ماشي صح.',
+    priv_h: 'مشفّر على موبايلك. مش بنبيعه. مش بنشاركه.',
+    priv_p: 'عملياتك بتعيش على جهازك، مشفّرة بـ SQLCipher. تحليلاتنا مجهولة وبتخص استخدام المميزات بس — إحنا مش شايفين إنت بتصرف على إيه، وعمرنا ما بنبيع بياناتك لحد.',
+    priv_link: 'اقرا سياسة الخصوصية كاملة',
+    faq_kicker: 'أسئلة', faq_h2: 'حلو إنك تعرف.',
+    cta_h: 'اتحكّم في مصاريفك.',
+    cta_p: 'ابدأ ببلاش. خصوصية من أول يوم. باللغة اللي بتفكّر بيها فعلاً.',
+    cta_btn: 'حمّل التطبيق', cta_note: 'iOS · Android قريباً',
+    store_ios_top: 'حمّله من', store_and_top: 'متوفّر على',
+    foot_tag: 'رسائل بنكك، بتتحوّل لصورة واضحة وآمنة لفلوسك. اتعمل في مصر، بالعربي والإنجليزي.',
+    foot_product: 'المنتج', foot_company: 'الشركة', foot_legal: 'قانوني',
+    foot_support: 'الدعم', foot_privacy: 'سياسة الخصوصية', foot_terms: 'شروط الاستخدام', foot_rights: 'كل الحقوق محفوظة',
+  },
+};
+
+/* ---------- 2. PHONE MOCKUPS ---------- */
+const ST_BAR = `<div class="st-bar"><span class="num st-time">9:41</span><span class="st-icons"><svg viewBox="0 0 18 12" width="17"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 16 12" width="16"><path d="M8 2.5c2 0 3.8.8 5.1 2.1l1.1-1.1A9 9 0 0 0 8 .5 9 9 0 0 0 1.8 3.5l1.1 1.1A7 7 0 0 1 8 2.5zM8 6c1 0 2 .4 2.7 1.1l1.1-1.1A5.5 5.5 0 0 0 8 4a5.5 5.5 0 0 0-3.8 2l1.1 1.1A4 4 0 0 1 8 6zm0 3.5l1.6-1.6a2.3 2.3 0 0 0-3.2 0L8 9.5z"/></svg><svg viewBox="0 0 26 12" width="24"><rect x="0.5" y="1" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1" opacity=".5"/><rect x="2" y="2.5" width="16" height="7" rx="1.2"/><rect x="23" y="4" width="2" height="4" rx="1"/></svg></span></div>`;
+
+function phone(inner, theme) {
+  return `<div class="phone ${theme === 'dark' ? 'phone-dark' : ''}">
+    <div class="phone-island"></div>
+    <div class="phone-screen">${ST_BAR}<div class="phone-app">${inner}</div></div>
+  </div>`;
+}
+
+/* real iPhone-framed screenshot, with a striped placeholder until the file exists */
+function phoneShot(src, label, theme) {
+  const file = src.split('/').pop();
+  return `<div class="phone">
+    <div class="phone-island"></div>
+    <div class="phone-screen">${ST_BAR}
+      <div class="phone-shotwrap">
+        <div class="phone-ph"><span class="ph-tag">${file}</span><span class="ph-cap">${label}</span></div>
+        <img class="phone-shot" src="${src}" alt="${label}" loading="lazy" onerror="this.remove()" />
+      </div>
+    </div>
+  </div>`;
+}
+
+const tx = (icon, color, name, cat, amt, sign, time) => `
+  <div class="tx">
+    <div class="tx-ic" style="background:${color}1a;color:${color}">${icon}</div>
+    <div class="tx-mid"><div class="tx-name">${name}</div><div class="tx-cat">${cat} · <span class="num">${time}</span></div></div>
+    <div class="tx-amt num" style="color:${sign === '+' ? '#57B078' : 'inherit'}">${sign}EGP ${amt}</div>
+  </div>`;
+
+const I = {
+  bag: '<svg viewBox="0 0 24 24" width="17" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>',
+  car: '<svg viewBox="0 0 24 24" width="17" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13v4a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-4z"/><circle cx="7.5" cy="14.5" r="1"/><circle cx="16.5" cy="14.5" r="1"/></svg>',
+  cup: '<svg viewBox="0 0 24 24" width="17" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8z"/><path d="M16 9h2a2 2 0 0 1 0 4h-2"/></svg>',
+  cart: '<svg viewBox="0 0 24 24" width="17" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h2l2 10h9l2-7H7"/><circle cx="9" cy="19" r="1"/><circle cx="17" cy="19" r="1"/></svg>',
+  wallet: '<svg viewBox="0 0 24 24" width="17" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M16 12h3"/></svg>',
+  bill: '<svg viewBox="0 0 24 24" width="17" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="3" width="12" height="18" rx="1"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
+};
+
+function screenHome() {
+  return `
+  <div class="app-top"><div><div class="app-hi">Ahlan, Nour 👋</div><div class="app-sub">June · spending so far</div></div><div class="app-av">ن</div></div>
+  <div class="balance-card grad">
+    <div class="bc-label">Spent this month</div>
+    <div class="bc-amt num">EGP 9,840</div>
+    <div class="bc-row"><span class="bc-pill">▲ <span class="num">12%</span> vs May</span><span class="bc-cap">Captured from SMS</span></div>
+  </div>
+  <div class="sms-toast"><span class="sms-dot"></span><span><b>New SMS captured</b> · CIB · EGP 240 → Food</span></div>
+  <div class="sec-head"><span>Recent</span><span class="sec-link">All</span></div>
+  <div class="tx-list">
+    ${tx(I.bag, '#D9584B', 'Talabat', 'Food &amp; Dining', '240', '-', '2:14 PM')}
+    ${tx(I.car, '#3FA6A2', 'Uber', 'Transport', '85', '-', '11:02 AM')}
+    ${tx(I.wallet, '#57B078', 'Salary — ACME', 'Income', '18,000', '+', 'Jun 1')}
+    ${tx(I.cart, '#D9584B', 'Carrefour', 'Groceries', '612', '-', 'May 31')}
+    ${tx(I.bill, '#D3952B', 'Vodafone', 'Bills', '199', '-', 'May 30')}
+  </div>`;
+}
+
+const bud = (icon, color, name, spent, limit, pct) => `
+  <div class="bud">
+    <div class="bud-head"><div class="bud-ic" style="background:${color}1a;color:${color}">${icon}</div><div class="bud-name">${name}</div><div class="bud-fig num">${spent} / ${limit}</div></div>
+    <div class="bud-bar"><div class="bud-fill" style="width:${pct}%;background:${color}"></div></div>
+  </div>`;
+
+function screenBudgets() {
+  return `
+  <div class="app-top"><div class="app-hi">Budgets</div><div class="app-sub2 num">June 2026</div></div>
+  <div class="bud-list">
+    ${bud(I.cup, '#D9584B', 'Food &amp; Dining', '2,400', '3,000', 80)}
+    ${bud(I.car, '#3FA6A2', 'Transport', '640', '1,200', 53)}
+    ${bud(I.bag, '#D3952B', 'Shopping', '1,150', '1,500', 77)}
+    ${bud(I.bill, '#57B078', 'Bills', '900', '2,000', 45)}
+  </div>
+  <div class="chat">
+    <div class="chat-ai"><div class="chat-av grad">م</div><div class="chat-bub">يا نجم، صرفت <span class="num">٨٠٪</span> من ميزانية الأكل والشهر لسه نصه 👀 نقلّل الديليفري شوية؟</div></div>
+    <div class="chat-me"><div class="chat-bub me">ماشي، ظبّطلي تنبيه</div></div>
+  </div>
+  <div class="chat-input"><span>Ask your money-buddy…</span><span class="chat-send grad">↑</span></div>`;
+}
+
+function screenInsights() {
+  const cats = [['Food', 32, '#D9584B'], ['Shopping', 22, '#D3952B'], ['Transport', 18, '#3FA6A2'], ['Bills', 15, '#157C78'], ['Other', 13, '#8A938F']];
+  const bars = [60, 48, 72, 55, 80, 64].map((h, i) => `<div class="trend-bar" style="height:${h}%;${i === 4 ? 'background:var(--grad);' : ''}"></div>`).join('');
+  const ring = `conic-gradient(#D9584B 0 32%, #D3952B 32% 54%, #3FA6A2 54% 72%, #157C78 72% 87%, #8A938F 87% 100%)`;
+  return `
+  <div class="app-top"><div class="app-hi">Insights</div><div class="app-sub2">This month</div></div>
+  <div class="donut-card">
+    <div class="donut" style="background:${ring}"><div class="donut-hole"><div class="donut-amt num">9,840</div><div class="donut-cap">EGP</div></div></div>
+    <div class="legend">${cats.map(c => `<div class="leg"><span class="leg-dot" style="background:${c[2]}"></span><span class="leg-n">${c[0]}</span><span class="leg-p num">${c[1]}%</span></div>`).join('')}</div>
+  </div>
+  <div class="sec-head"><span>6-month trend</span><span class="sec-link num">▼ 8%</span></div>
+  <div class="trend">${bars}</div>
+  <div class="salary-note"><span class="sn-ic">📅</span><span><b>Salary-cycle aware</b> · 11 days to payday · you're on pace.</span></div>`;
+}
+
+function screenPrivacy() {
+  const row = (t, s) => `<div class="pv-row"><div class="pv-check">✓</div><div><div class="pv-t">${t}</div><div class="pv-s">${s}</div></div></div>`;
+  return `
+  <div class="pv-hero">
+    <div class="pv-shield grad"><svg viewBox="0 0 24 24" width="30" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l7 3v6c0 4.5-3 8.3-7 9.5C8 19.3 5 15.5 5 11V5l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+    <div class="pv-h">Encrypted on this device</div>
+    <div class="pv-sub">Your data never leaves your phone unprotected.</div>
+  </div>
+  <div class="pv-list">
+    ${row('Local-first storage', 'SQLCipher-encrypted database')}
+    ${row('AI sees aggregates only', 'Never your raw transactions')}
+    ${row('Anonymous analytics', 'Feature usage, nothing personal')}
+    ${row('No data selling', 'Not now, not ever')}
+  </div>
+  <div class="pv-foot"><span class="num">🔒 AES-256</span> · on-device</div>`;
+}
+
+const SCREENS = { home: screenHome, budgets: screenBudgets, insights: screenInsights, privacy: screenPrivacy };
+
+/* ---------- 3. FAQ ---------- */
+const FAQ = [
+  { q: { en: 'How do I delete my account and data?', ar: 'إزاي أمسح حسابي وبياناتي؟' },
+    a: { en: 'Everything lives on your device, so deleting the app removes your data instantly. To erase a synced backup, go to Settings → Account → Delete account, or email hello@masareef.app and we\'ll confirm within 48 hours.',
+         ar: 'كل حاجة موجودة على جهازك، فمسح التطبيق بيمسح بياناتك على طول. لو عايز تمسح نسخة احتياطية، روح الإعدادات ← الحساب ← حذف الحساب، أو ابعتلنا على hello@masareef.app وهنأكدلك خلال ٤٨ ساعة.' } },
+  { q: { en: 'Which banks and wallets are supported?', ar: 'أنهي بنوك ومحافظ مدعومة؟' },
+    a: { en: 'Masareef reads SMS from 30+ Egyptian banks and wallets including NBE, CIB, QNB, Banque Misr, HSBC, AlexBank, Vodafone Cash, InstaPay and Fawry. New formats are added regularly.',
+         ar: 'مصاريف بيقرا رسائل أكتر من ٣٠ بنك ومحفظة مصرية، منهم البنك الأهلي، CIB، QNB، بنك مصر، HSBC، بنك الإسكندرية، فودافون كاش، إنستاباي وفوري. وبنضيف صيغ جديدة باستمرار.' } },
+  { q: { en: 'Is Masareef free?', ar: 'مصاريف ببلاش؟' },
+    a: { en: 'Yes — core tracking, budgets and insights are free. Masareef+ unlocks the AI money-buddy and advanced reports as an auto-renewable subscription you can cancel anytime.',
+         ar: 'أيوه — التتبّع والميزانيات والتحليلات الأساسية ببلاش. واشتراك مصاريف+ بيفتح المساعد الذكي والتقارير المتقدمة باشتراك متجدّد تلقائياً تقدر تلغيه في أي وقت.' } },
+  { q: { en: 'How does SMS reading actually work?', ar: 'قراءة الرسائل بتشتغل إزاي بالظبط؟' },
+    a: { en: 'With your permission, Masareef parses incoming bank SMS on-device to extract the merchant and amount. The parsing happens locally — the raw message text never leaves your phone.',
+         ar: 'بإذنك، مصاريف بيحلّل رسائل البنك على الجهاز نفسه عشان يطلّع اسم المحل والمبلغ. التحليل بيحصل محلّياً — نص الرسالة الأصلي عمره ما بيخرج من موبايلك.' } },
+  { q: { en: 'Is my data safe?', ar: 'بياناتي في أمان؟' },
+    a: { en: 'Your transactions are stored in an encrypted SQLCipher database on your device. The AI only ever receives anonymised aggregates, and we never sell or share your data.',
+         ar: 'عملياتك متخزّنة في قاعدة بيانات مشفّرة بـ SQLCipher على جهازك. الذكاء الاصطناعي بيستقبل أرقام مجمّعة مجهولة بس، وإحنا عمرنا ما بنبيع أو نشارك بياناتك.' } },
+];
+
+/* ---------- 4. LEGAL CONTENT ---------- */
+function legalDoc(title, updated, sections) {
+  return `<h1 class="legal-h1">${title}</h1><p class="legal-upd num">${updated}</p>` +
+    sections.map(s => `<h2 class="legal-h2">${s[0]}</h2><div class="legal-body">${s[1]}</div>`).join('');
+}
+const LEGAL = {
+  privacy: {
+    en: legalDoc('Privacy Policy', 'Last updated · 1 June 2026', [
+      ['1. Our promise', '<p>Masareef is built local-first. Your financial data is stored, encrypted, on your device. We designed the app so that we — the company — cannot see your individual transactions. This policy explains, in plain language, what we collect and what we never touch.</p>'],
+      ['2. What stays on your device', '<p>Bank SMS content, parsed transactions, budgets, categories and notes are stored in an encrypted SQLCipher database on your phone. This information is not transmitted to our servers in identifiable form.</p>'],
+      ['3. What the AI sees', '<p>To power budgeting suggestions, the assistant receives only anonymised aggregates (for example, "dining: 32% of monthly spend"). It never receives raw SMS text or individual transaction records.</p>'],
+      ['4. Analytics', '<p>We collect anonymous, feature-usage analytics (e.g. which screens are opened) to improve the product. This data cannot be linked back to your identity or your spending.</p>'],
+      ['5. Data we never sell', '<p>We do not sell, rent, or share your personal or financial data with advertisers or data brokers. Ever.</p>'],
+      ['6. Third-party services', '<p>To run the app we rely on a few trusted service providers, each receiving only the minimum data needed:</p><ul><li><b>Supabase</b> — encrypted cloud backup &amp; sync of your account and data.</li><li><b>Anthropic (Claude)</b> — powers AI features; budgeting receives only aggregated summaries, and occasionally a single bank SMS that could not be parsed on-device is sent to improve accuracy — never your full history.</li><li><b>Sentry</b> — crash &amp; error diagnostics (no transaction data).</li><li><b>Mixpanel</b> — anonymous, feature-usage analytics (no amounts or merchants).</li><li><b>RevenueCat</b> — manages subscriptions (no banking data).</li><li><b>Google Places</b> — looks up merchant names to categorise spending.</li><li><b>exchangerate-api.com</b> — currency-conversion rates (no personal data).</li></ul><p>Each receives the minimum needed, never your full transaction history. Your data stays <b>encrypted on your device</b>, and we <b>never sell it</b>.</p>'],
+      ['7. Your rights & deletion', '<p>You can delete all data at any time by removing the app or via Settings → Account → Delete account. For help, contact <a href="mailto:privacy@masareef.app">privacy@masareef.app</a>.</p>'],
+      ['8. Contact', '<p>Questions about privacy? Email <a href="mailto:privacy@masareef.app">privacy@masareef.app</a> and we\'ll respond within 48 hours.</p>'],
+    ]),
+    ar: legalDoc('سياسة الخصوصية', 'آخر تحديث · ١ يونيو ٢٠٢٦', [
+      ['١. وعدنا', '<p>مصاريف مبني محلّياً أولاً. بياناتك المالية متخزّنة، مشفّرة، على جهازك. صمّمنا التطبيق بحيث إن الشركة نفسها مش قادرة تشوف عملياتك الفردية. السياسة دي بتشرح، بلغة بسيطة، إيه اللي بنجمعه وإيه اللي عمرنا ما بنلمسه.</p>'],
+      ['٢. اللي بيفضل على جهازك', '<p>محتوى رسائل البنك، العمليات، الميزانيات، الفئات والملاحظات متخزّنة في قاعدة بيانات مشفّرة بـ SQLCipher على موبايلك. المعلومات دي مش بتتبعت لخوادمنا بشكل يحدّد هويتك.</p>'],
+      ['٣. اللي بيشوفه الذكاء الاصطناعي', '<p>عشان يقترح ميزانيات، المساعد بيستقبل أرقام مجمّعة مجهولة بس (مثلاً: «الأكل: ٣٢٪ من صرف الشهر»). عمره ما بيستقبل نص الرسائل الأصلي أو تفاصيل العمليات.</p>'],
+      ['٤. التحليلات', '<p>بنجمع تحليلات استخدام مجهولة (مثلاً أنهي شاشات بتتفتح) عشان نحسّن المنتج. البيانات دي مينفعش تترجع لهويتك أو لصرفك.</p>'],
+      ['٥. بيانات عمرنا ما بنبيعها', '<p>إحنا مش بنبيع أو نأجّر أو نشارك بياناتك الشخصية أو المالية مع معلنين أو وسطاء بيانات. أبداً.</p>'],
+      ['٦. خدمات الطرف الثالث', '<p>عشان نشغّل التطبيق بنعتمد على كام مزوّد خدمة موثوق، وكل واحد بياخد الحد الأدنى من البيانات بس:</p><ul><li><b>Supabase</b> — نسخة احتياطية ومزامنة مشفّرة لحسابك وبياناتك.</li><li><b>Anthropic (Claude)</b> — بيشغّل مزايا الذكاء الاصطناعي؛ في الميزانية بياخد أرقام مجمّعة بس، وأحياناً رسالة بنك واحدة صعب تحليلها على الجهاز بتتبعت لتحسين الدقة — عمره ما بياخد كل عملياتك.</li><li><b>Sentry</b> — تشخيص الأعطال والأخطاء (من غير بيانات عمليات).</li><li><b>Mixpanel</b> — تحليلات استخدام مجهولة (من غير مبالغ أو أسماء تجار).</li><li><b>RevenueCat</b> — إدارة الاشتراكات (من غير بيانات بنكية).</li><li><b>Google Places</b> — البحث عن أسماء التجار لتصنيف الصرف.</li><li><b>exchangerate-api.com</b> — أسعار تحويل العملات (من غير بيانات شخصية).</li></ul><p>كل خدمة بتاخد الحد الأدنى المطلوب بس، عمرها ما بتاخد كل عملياتك. بياناتك بتفضل <b>مشفّرة على جهازك</b>، وإحنا <b>عمرنا ما بنبيعها</b>.</p>'],
+      ['٧. حقوقك والحذف', '<p>تقدر تمسح كل بياناتك في أي وقت بمسح التطبيق أو من الإعدادات ← الحساب ← حذف الحساب. للمساعدة، تواصل مع <a href="mailto:privacy@masareef.app">privacy@masareef.app</a>.</p>'],
+      ['٨. تواصل', '<p>عندك أسئلة عن الخصوصية؟ ابعت لـ <a href="mailto:privacy@masareef.app">privacy@masareef.app</a> وهنرد خلال ٤٨ ساعة.</p>'],
+    ]),
+  },
+  terms: {
+    en: legalDoc('Terms of Use', 'Last updated · 1 June 2026', [
+      ['1. Agreement', '<p>By downloading or using Masareef ("the app"), you agree to these Terms of Use. If you do not agree, please do not use the app.</p>'],
+      ['2. The service', '<p>Masareef helps you track spending and build budgets by parsing bank SMS on your device. It is an informational tool and is not a bank, payment processor, or financial advisor.</p>'],
+      ['3. Subscriptions (auto-renewable)', '<p>Masareef comes in two plans:</p><ul><li><b>Free</b> — has everything, with up to <span class="num">10</span> AI prompts per day.</li><li><b>Masareef+</b> — an auto-renewable subscription that unlocks unlimited AI and advanced reports.</li></ul><p>For Masareef+ subscriptions:</p><ul><li>Payment is charged to your Apple ID at confirmation of purchase.</li><li>The subscription renews automatically unless cancelled at least <span class="num">24</span> hours before the end of the current period.</li><li>You can manage or cancel anytime in your App Store account settings.</li><li>Any unused portion of a free trial is forfeited when a subscription is purchased.</li></ul>'],
+      ['4. Acceptable use', '<p>You agree not to misuse the app, attempt to reverse-engineer it, or use it for unlawful purposes.</p>'],
+      ['5. Disclaimers', '<p>The app is provided "as is". Figures and insights are estimates based on parsed SMS and may contain errors. Always verify against your official bank statements.</p>'],
+      ['6. Limitation of liability', '<p>To the extent permitted by law, Masareef is not liable for indirect or consequential damages arising from use of the app.</p>'],
+      ['7. Changes & contact', '<p>We may update these terms; continued use means acceptance. Questions: <a href="mailto:legal@masareef.app">legal@masareef.app</a>.</p>'],
+    ]),
+    ar: legalDoc('شروط الاستخدام', 'آخر تحديث · ١ يونيو ٢٠٢٦', [
+      ['١. الاتفاق', '<p>بتحميلك أو استخدامك لمصاريف («التطبيق»)، إنت بتوافق على شروط الاستخدام دي. لو مش موافق، من فضلك متستخدمش التطبيق.</p>'],
+      ['٢. الخدمة', '<p>مصاريف بيساعدك تتبّع صرفك وتعمل ميزانيات عن طريق تحليل رسائل البنك على جهازك. ده أداة معلوماتية، ومش بنك ولا معالج مدفوعات ولا مستشار مالي.</p>'],
+      ['٣. الاشتراكات (متجدّدة تلقائياً)', '<p>مصاريف بييجي في خطتين:</p><ul><li><b>مجاني</b> — فيه كل حاجة، مع حد أقصى <span class="num">10</span> طلبات ذكاء اصطناعي في اليوم.</li><li><b>مصاريف+</b> — اشتراك متجدّد تلقائياً بيفتح الذكاء الاصطناعي بلا حدود والتقارير المتقدمة.</li></ul><p>بالنسبة لاشتراك مصاريف+:</p><ul><li>بيتم خصم المبلغ من حساب Apple ID عند تأكيد الشراء.</li><li>الاشتراك بيتجدّد تلقائياً إلا لو اتلغى قبل نهاية الفترة الحالية بـ <span class="num">24</span> ساعة على الأقل.</li><li>تقدر تدير أو تلغي في أي وقت من إعدادات حساب App Store.</li><li>أي جزء غير مستخدم من فترة تجريبية مجانية بيسقط عند شراء اشتراك.</li></ul>'],
+      ['٤. الاستخدام المقبول', '<p>بتوافق إنك متسيئش استخدام التطبيق، أو تحاول تعمله هندسة عكسية، أو تستخدمه لأغراض غير قانونية.</p>'],
+      ['٥. إخلاء المسؤولية', '<p>التطبيق متقدّم «كما هو». الأرقام والتحليلات تقديرية مبنية على تحليل الرسائل وممكن تحتوي على أخطاء. راجع دايماً كشف حسابك الرسمي.</p>'],
+      ['٦. حدود المسؤولية', '<p>في حدود ما يسمح به القانون، مصاريف غير مسؤول عن أي أضرار غير مباشرة ناتجة عن استخدام التطبيق.</p>'],
+      ['٧. التغييرات والتواصل', '<p>ممكن نحدّث الشروط دي؛ واستمرارك في الاستخدام معناه الموافقة. للأسئلة: <a href="mailto:legal@masareef.app">legal@masareef.app</a>.</p>'],
+    ]),
+  },
+  support: {
+    en: legalDoc('Support', 'We usually reply within 48 hours', [
+      ['Get in touch', '<p>Need help with Masareef? Email us at <a href="mailto:hello@masareef.app">hello@masareef.app</a>. We read every message and reply within 48 hours, in Arabic or English.</p>'],
+      ['Delete your account & data', '<p>Because Masareef is local-first, deleting the app removes your data from your device immediately. To remove any synced backup: open the app → <b>Settings → Account → Delete account</b>, or email <a href="mailto:hello@masareef.app">hello@masareef.app</a> with the subject "Delete my data" and we\'ll confirm within 48 hours.</p>'],
+      ['Manage your subscription', '<p>Masareef+ subscriptions are managed through your Apple ID. Go to <b>Settings → [your name] → Subscriptions</b> on your device to view, change, or cancel.</p>'],
+      ['Common questions', '<p>Many answers — supported banks, SMS reading, pricing and privacy — are covered in the FAQ on our home page. Still stuck? Just email us.</p>'],
+    ]),
+    ar: legalDoc('الدعم', 'بنرد عادةً خلال ٤٨ ساعة', [
+      ['تواصل معانا', '<p>محتاج مساعدة في مصاريف؟ ابعتلنا على <a href="mailto:hello@masareef.app">hello@masareef.app</a>. بنقرا كل رسالة وبنرد خلال ٤٨ ساعة، بالعربي أو الإنجليزي.</p>'],
+      ['امسح حسابك وبياناتك', '<p>لأن مصاريف محلّي أولاً، مسح التطبيق بيشيل بياناتك من جهازك على طول. لمسح أي نسخة احتياطية: افتح التطبيق ← <b>الإعدادات ← الحساب ← حذف الحساب</b>، أو ابعت لـ <a href="mailto:hello@masareef.app">hello@masareef.app</a> بعنوان «امسح بياناتي» وهنأكدلك خلال ٤٨ ساعة.</p>'],
+      ['إدارة اشتراكك', '<p>اشتراكات مصاريف+ بتتدار من خلال حساب Apple ID. روح <b>الإعدادات ← [اسمك] ← الاشتراكات</b> على جهازك عشان تشوف أو تغيّر أو تلغي.</p>'],
+      ['أسئلة شائعة', '<p>كتير من الإجابات — البنوك المدعومة، قراءة الرسائل، الأسعار والخصوصية — موجودة في قسم الأسئلة في الصفحة الرئيسية. لسه محتاج مساعدة؟ ابعتلنا إيميل.</p>'],
+    ]),
+  },
+};
+
+/* ---------- 5. STATE & RENDER ---------- */
+let lang = localStorage.getItem('ms_lang') || 'en';
+let theme = 'light';
+
+function applyLang() {
+  const isAr = lang === 'ar';
+  document.documentElement.lang = isAr ? 'ar' : 'en';
+  document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (I18N[lang][k] != null) el.innerHTML = I18N[lang][k];
+  });
+  renderPhones(); renderFAQ();
+  if (!document.getElementById('view-legal').classList.contains('hidden')) renderLegalCurrent();
+  localStorage.setItem('ms_lang', lang);
+}
+function applyTheme() {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+  renderPhones();
+  localStorage.setItem('ms_theme', theme);
+}
+function renderPhones() {
+  const hero = document.getElementById('phone-hero');
+  if (hero) hero.innerHTML = phoneShot('uploads/home_en.png', lang === 'ar' ? 'الرئيسية' : 'Home screen', theme);
+  document.querySelectorAll('.phone-slot').forEach(slot => {
+    const src = slot.getAttribute('data-shot');
+    const label = slot.getAttribute('data-label') || '';
+    slot.innerHTML = phoneShot(src, label, theme);
+  });
+}
+function renderFAQ() {
+  document.getElementById('faqList').innerHTML = FAQ.map(f => `
+    <details class="faq-item group rounded-card border hair bg-white dark:bg-dcard overflow-hidden">
+      <summary class="flex items-center justify-between gap-4 cursor-pointer px-5 sm:px-6 py-5">
+        <span class="text-[16px] sm:text-[17px] font-semibold text-ink dark:text-dink">${f.q[lang]}</span>
+        <span class="faq-chev shrink-0 w-6 h-6 grid place-items-center text-teal dark:text-tealmid transition-transform duration-300 text-xl leading-none">+</span>
+      </summary>
+      <div class="faq-body"><div class="overflow-hidden"><p class="px-5 sm:px-6 pb-5 text-[15px] leading-relaxed text-muted dark:text-dmuted">${f.a[lang]}</p></div></div>
+    </details>`).join('');
+}
+let currentLegal = null;
+function renderLegalCurrent() {
+  if (currentLegal) document.getElementById('legalContent').innerHTML = LEGAL[currentLegal][lang];
+}
+
+/* ---------- 6. ROUTER ---------- */
+const LEGAL_ROUTES = ['privacy', 'terms', 'support'];
+function route() {
+  const h = location.hash.replace('#/', '');
+  const home = document.getElementById('view-home');
+  const legal = document.getElementById('view-legal');
+  if (LEGAL_ROUTES.includes(h)) {
+    currentLegal = h;
+    home.classList.add('hidden'); legal.classList.remove('hidden');
+    renderLegalCurrent();
+    window.scrollTo(0, 0);
+  } else {
+    home.classList.remove('hidden'); legal.classList.add('hidden');
+    currentLegal = null;
+  }
+}
+
+/* ---------- 7. WIRE UP ---------- */
+function bindAll(cls, fn) { document.querySelectorAll(cls).forEach(el => el.addEventListener('click', fn)); }
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme(); applyLang();
+  route();
+
+  bindAll('#langToggle, .langToggle', () => { lang = lang === 'en' ? 'ar' : 'en'; applyLang(); });
+
+  window.addEventListener('hashchange', route);
+
+  // nav scroll style
+  const navbar = document.getElementById('navbar');
+  const onScroll = () => {
+    if (window.scrollY > 12) navbar.classList.add('nav-scrolled', 'bg-paper/80', 'dark:bg-dbg/80', 'shadow-soft', 'border-hair');
+    else navbar.classList.remove('nav-scrolled', 'bg-paper/80', 'dark:bg-dbg/80', 'shadow-soft', 'border-hair');
+  };
+  window.addEventListener('scroll', onScroll); onScroll();
+
+  // reveal — immediate in-view pass + scroll, robust across render contexts
+  const revealInView = () => {
+    const vh = window.innerHeight || 800;
+    document.querySelectorAll('.reveal:not(.in)').forEach(el => {
+      if (el.getBoundingClientRect().top < vh * 0.92) el.classList.add('in');
+    });
+  };
+  revealInView();
+  window.addEventListener('scroll', revealInView, { passive: true });
+  window.addEventListener('resize', revealInView);
+  // safety: ensure nothing stays hidden if measurements are unavailable
+  setTimeout(revealInView, 200);
+});
+
+</script>
+</body>
+</html>
