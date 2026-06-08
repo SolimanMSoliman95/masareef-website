@@ -502,7 +502,7 @@
         <ul class="space-y-2.5 text-[14.5px] text-ink2 dark:text-dink">
           <li><a href="#privacy" class="hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="nav_privacy">Privacy</a></li>
           <li><a href="#/support" class="route-link hover:text-teal dark:hover:text-tealmid transition-colors" data-i18n="foot_support">Support</a></li>
-          <li><a href="mailto:hello@masareef.app" class="hover:text-teal dark:hover:text-tealmid transition-colors">hello@masareef.app</a></li>
+          <li><a href="mailto:hello@getmasareef.com" class="hover:text-teal dark:hover:text-tealmid transition-colors">hello@getmasareef.com</a></li>
         </ul>
       </div>
       <div>
@@ -724,8 +724,8 @@ const SCREENS = { home: screenHome, budgets: screenBudgets, insights: screenInsi
 /* ---------- 3. FAQ ---------- */
 const FAQ = [
   { q: { en: 'How do I delete my account and data?', ar: 'إزاي أمسح حسابي وبياناتي؟' },
-    a: { en: 'Everything lives on your device, so deleting the app removes your data instantly. To erase a synced backup, go to Settings → Account → Delete account, or email hello@masareef.app and we\'ll confirm within 48 hours.',
-         ar: 'كل حاجة موجودة على جهازك، فمسح التطبيق بيمسح بياناتك على طول. لو عايز تمسح نسخة احتياطية، روح الإعدادات ← الحساب ← حذف الحساب، أو ابعتلنا على hello@masareef.app وهنأكدلك خلال ٤٨ ساعة.' } },
+    a: { en: 'Everything lives on your device, so deleting the app removes your data instantly. To erase a synced backup, go to Settings → Account → Delete account, or email hello@getmasareef.com and we\'ll confirm within 48 hours.',
+         ar: 'كل حاجة موجودة على جهازك، فمسح التطبيق بيمسح بياناتك على طول. لو عايز تمسح نسخة احتياطية، روح الإعدادات ← الحساب ← حذف الحساب، أو ابعتلنا على hello@getmasareef.com وهنأكدلك خلال ٤٨ ساعة.' } },
   { q: { en: 'Which banks and wallets are supported?', ar: 'أنهي بنوك ومحافظ مدعومة؟' },
     a: { en: 'Masareef reads SMS from 30+ Egyptian banks and wallets including NBE, CIB, QNB, Banque Misr, HSBC, AlexBank, Vodafone Cash, InstaPay and Fawry. New formats are added regularly.',
          ar: 'مصاريف بيقرا رسائل أكتر من ٣٠ بنك ومحفظة مصرية، منهم البنك الأهلي، CIB، QNB، بنك مصر، HSBC، بنك الإسكندرية، فودافون كاش، إنستاباي وفوري. وبنضيف صيغ جديدة باستمرار.' } },
@@ -753,9 +753,9 @@ const LEGAL = {
       ['3. What the AI sees', '<p>To power budgeting suggestions, the assistant receives only anonymised aggregates (for example, "dining: 32% of monthly spend"). It never receives raw SMS text or individual transaction records.</p>'],
       ['4. Analytics', '<p>We collect anonymous, feature-usage analytics (e.g. which screens are opened) to improve the product. This data cannot be linked back to your identity or your spending.</p>'],
       ['5. Data we never sell', '<p>We do not sell, rent, or share your personal or financial data with advertisers or data brokers. Ever.</p>'],
-      ['6. Third-party services', '<p>To run the app we rely on a few trusted service providers, each receiving only the minimum data needed:</p><ul><li><b>Supabase</b> — encrypted cloud backup &amp; sync of your account and data.</li><li><b>Anthropic (Claude)</b> — powers AI features; budgeting receives only aggregated summaries, and occasionally a single bank SMS that could not be parsed on-device is sent to improve accuracy — never your full history.</li><li><b>Sentry</b> — crash &amp; error diagnostics (no transaction data).</li><li><b>Mixpanel</b> — anonymous, feature-usage analytics (no amounts or merchants).</li><li><b>RevenueCat</b> — manages subscriptions (no banking data).</li><li><b>Google Places</b> — looks up merchant names to categorise spending.</li><li><b>exchangerate-api.com</b> — currency-conversion rates (no personal data).</li></ul><p>Each receives the minimum needed, never your full transaction history. Your data stays <b>encrypted on your device</b>, and we <b>never sell it</b>.</p>'],
-      ['7. Your rights & deletion', '<p>You can delete all data at any time by removing the app or via Settings → Account → Delete account. For help, contact <a href="mailto:privacy@masareef.app">privacy@masareef.app</a>.</p>'],
-      ['8. Contact', '<p>Questions about privacy? Email <a href="mailto:privacy@masareef.app">privacy@masareef.app</a> and we\'ll respond within 48 hours.</p>'],
+      ['6. Third-party services', '<p>To run the app we rely on a few trusted service providers, each receiving only the minimum data needed:</p><ul><li><b>Sentry</b> — crash &amp; error diagnostics (no transaction data).</li><li><b>Mixpanel</b> — anonymous, feature-usage analytics (no amounts or merchants).</li><li><b>RevenueCat</b> — manages subscriptions (no banking data).</li><li><b>Google Places</b> — looks up merchant names to categorise spending.</li></ul><p>Each receives the minimum needed, never your full transaction history. Your data stays <b>encrypted on your device</b>, and we <b>never sell it</b>.</p>'],
+      ['7. Your rights & deletion', '<p>You can delete all data at any time by removing the app or via Settings → Account → Delete account. For help, contact <a href="mailto:privacy@getmasareef.com">privacy@getmasareef.com</a>.</p>'],
+      ['8. Contact', '<p>Questions about privacy? Email <a href="mailto:privacy@getmasareef.com">privacy@getmasareef.com</a> and we\'ll respond within 48 hours.</p>'],
     ]),
     ar: legalDoc('سياسة الخصوصية', 'آخر تحديث · ١ يونيو ٢٠٢٦', [
       ['١. وعدنا', '<p>مصاريف مبني محلّياً أولاً. بياناتك المالية متخزّنة، مشفّرة، على جهازك. صمّمنا التطبيق بحيث إن الشركة نفسها مش قادرة تشوف عملياتك الفردية. السياسة دي بتشرح، بلغة بسيطة، إيه اللي بنجمعه وإيه اللي عمرنا ما بنلمسه.</p>'],
@@ -763,9 +763,9 @@ const LEGAL = {
       ['٣. اللي بيشوفه الذكاء الاصطناعي', '<p>عشان يقترح ميزانيات، المساعد بيستقبل أرقام مجمّعة مجهولة بس (مثلاً: «الأكل: ٣٢٪ من صرف الشهر»). عمره ما بيستقبل نص الرسائل الأصلي أو تفاصيل العمليات.</p>'],
       ['٤. التحليلات', '<p>بنجمع تحليلات استخدام مجهولة (مثلاً أنهي شاشات بتتفتح) عشان نحسّن المنتج. البيانات دي مينفعش تترجع لهويتك أو لصرفك.</p>'],
       ['٥. بيانات عمرنا ما بنبيعها', '<p>إحنا مش بنبيع أو نأجّر أو نشارك بياناتك الشخصية أو المالية مع معلنين أو وسطاء بيانات. أبداً.</p>'],
-      ['٦. خدمات الطرف الثالث', '<p>عشان نشغّل التطبيق بنعتمد على كام مزوّد خدمة موثوق، وكل واحد بياخد الحد الأدنى من البيانات بس:</p><ul><li><b>Supabase</b> — نسخة احتياطية ومزامنة مشفّرة لحسابك وبياناتك.</li><li><b>Anthropic (Claude)</b> — بيشغّل مزايا الذكاء الاصطناعي؛ في الميزانية بياخد أرقام مجمّعة بس، وأحياناً رسالة بنك واحدة صعب تحليلها على الجهاز بتتبعت لتحسين الدقة — عمره ما بياخد كل عملياتك.</li><li><b>Sentry</b> — تشخيص الأعطال والأخطاء (من غير بيانات عمليات).</li><li><b>Mixpanel</b> — تحليلات استخدام مجهولة (من غير مبالغ أو أسماء تجار).</li><li><b>RevenueCat</b> — إدارة الاشتراكات (من غير بيانات بنكية).</li><li><b>Google Places</b> — البحث عن أسماء التجار لتصنيف الصرف.</li><li><b>exchangerate-api.com</b> — أسعار تحويل العملات (من غير بيانات شخصية).</li></ul><p>كل خدمة بتاخد الحد الأدنى المطلوب بس، عمرها ما بتاخد كل عملياتك. بياناتك بتفضل <b>مشفّرة على جهازك</b>، وإحنا <b>عمرنا ما بنبيعها</b>.</p>'],
-      ['٧. حقوقك والحذف', '<p>تقدر تمسح كل بياناتك في أي وقت بمسح التطبيق أو من الإعدادات ← الحساب ← حذف الحساب. للمساعدة، تواصل مع <a href="mailto:privacy@masareef.app">privacy@masareef.app</a>.</p>'],
-      ['٨. تواصل', '<p>عندك أسئلة عن الخصوصية؟ ابعت لـ <a href="mailto:privacy@masareef.app">privacy@masareef.app</a> وهنرد خلال ٤٨ ساعة.</p>'],
+      ['٦. خدمات الطرف الثالث', '<p>عشان نشغّل التطبيق بنعتمد على كام مزوّد خدمة موثوق، وكل واحد بياخد الحد الأدنى من البيانات بس:</p><ul><li><b>Sentry</b> — تشخيص الأعطال والأخطاء (من غير بيانات عمليات).</li><li><b>Mixpanel</b> — تحليلات استخدام مجهولة (من غير مبالغ أو أسماء تجار).</li><li><b>RevenueCat</b> — إدارة الاشتراكات (من غير بيانات بنكية).</li><li><b>Google Places</b> — البحث عن أسماء التجار لتصنيف الصرف.</li></ul><p>كل خدمة بتاخد الحد الأدنى المطلوب بس، عمرها ما بتاخد كل عملياتك. بياناتك بتفضل <b>مشفّرة على جهازك</b>، وإحنا <b>عمرنا ما بنبيعها</b>.</p>'],
+      ['٧. حقوقك والحذف', '<p>تقدر تمسح كل بياناتك في أي وقت بمسح التطبيق أو من الإعدادات ← الحساب ← حذف الحساب. للمساعدة، تواصل مع <a href="mailto:privacy@getmasareef.com">privacy@getmasareef.com</a>.</p>'],
+      ['٨. تواصل', '<p>عندك أسئلة عن الخصوصية؟ ابعت لـ <a href="mailto:privacy@getmasareef.com">privacy@getmasareef.com</a> وهنرد خلال ٤٨ ساعة.</p>'],
     ]),
   },
   terms: {
@@ -776,7 +776,7 @@ const LEGAL = {
       ['4. Acceptable use', '<p>You agree not to misuse the app, attempt to reverse-engineer it, or use it for unlawful purposes.</p>'],
       ['5. Disclaimers', '<p>The app is provided "as is". Figures and insights are estimates based on parsed SMS and may contain errors. Always verify against your official bank statements.</p>'],
       ['6. Limitation of liability', '<p>To the extent permitted by law, Masareef is not liable for indirect or consequential damages arising from use of the app.</p>'],
-      ['7. Changes & contact', '<p>We may update these terms; continued use means acceptance. Questions: <a href="mailto:legal@masareef.app">legal@masareef.app</a>.</p>'],
+      ['7. Changes & contact', '<p>We may update these terms; continued use means acceptance. Questions: <a href="mailto:legal@getmasareef.com">legal@getmasareef.com</a>.</p>'],
     ]),
     ar: legalDoc('شروط الاستخدام', 'آخر تحديث · ١ يونيو ٢٠٢٦', [
       ['١. الاتفاق', '<p>بتحميلك أو استخدامك لمصاريف («التطبيق»)، إنت بتوافق على شروط الاستخدام دي. لو مش موافق، من فضلك متستخدمش التطبيق.</p>'],
@@ -785,19 +785,19 @@ const LEGAL = {
       ['٤. الاستخدام المقبول', '<p>بتوافق إنك متسيئش استخدام التطبيق، أو تحاول تعمله هندسة عكسية، أو تستخدمه لأغراض غير قانونية.</p>'],
       ['٥. إخلاء المسؤولية', '<p>التطبيق متقدّم «كما هو». الأرقام والتحليلات تقديرية مبنية على تحليل الرسائل وممكن تحتوي على أخطاء. راجع دايماً كشف حسابك الرسمي.</p>'],
       ['٦. حدود المسؤولية', '<p>في حدود ما يسمح به القانون، مصاريف غير مسؤول عن أي أضرار غير مباشرة ناتجة عن استخدام التطبيق.</p>'],
-      ['٧. التغييرات والتواصل', '<p>ممكن نحدّث الشروط دي؛ واستمرارك في الاستخدام معناه الموافقة. للأسئلة: <a href="mailto:legal@masareef.app">legal@masareef.app</a>.</p>'],
+      ['٧. التغييرات والتواصل', '<p>ممكن نحدّث الشروط دي؛ واستمرارك في الاستخدام معناه الموافقة. للأسئلة: <a href="mailto:legal@getmasareef.com">legal@getmasareef.com</a>.</p>'],
     ]),
   },
   support: {
     en: legalDoc('Support', 'We usually reply within 48 hours', [
-      ['Get in touch', '<p>Need help with Masareef? Email us at <a href="mailto:hello@masareef.app">hello@masareef.app</a>. We read every message and reply within 48 hours, in Arabic or English.</p>'],
-      ['Delete your account & data', '<p>Because Masareef is local-first, deleting the app removes your data from your device immediately. To remove any synced backup: open the app → <b>Settings → Account → Delete account</b>, or email <a href="mailto:hello@masareef.app">hello@masareef.app</a> with the subject "Delete my data" and we\'ll confirm within 48 hours.</p>'],
+      ['Get in touch', '<p>Need help with Masareef? Email us at <a href="mailto:hello@getmasareef.com">hello@getmasareef.com</a>. We read every message and reply within 48 hours, in Arabic or English.</p>'],
+      ['Delete your account & data', '<p>Because Masareef is local-first, deleting the app removes your data from your device immediately. To remove any synced backup: open the app → <b>Settings → Account → Delete account</b>, or email <a href="mailto:hello@getmasareef.com">hello@getmasareef.com</a> with the subject "Delete my data" and we\'ll confirm within 48 hours.</p>'],
       ['Manage your subscription', '<p>Masareef+ subscriptions are managed through your Apple ID. Go to <b>Settings → [your name] → Subscriptions</b> on your device to view, change, or cancel.</p>'],
       ['Common questions', '<p>Many answers — supported banks, SMS reading, pricing and privacy — are covered in the FAQ on our home page. Still stuck? Just email us.</p>'],
     ]),
     ar: legalDoc('الدعم', 'بنرد عادةً خلال ٤٨ ساعة', [
-      ['تواصل معانا', '<p>محتاج مساعدة في مصاريف؟ ابعتلنا على <a href="mailto:hello@masareef.app">hello@masareef.app</a>. بنقرا كل رسالة وبنرد خلال ٤٨ ساعة، بالعربي أو الإنجليزي.</p>'],
-      ['امسح حسابك وبياناتك', '<p>لأن مصاريف محلّي أولاً، مسح التطبيق بيشيل بياناتك من جهازك على طول. لمسح أي نسخة احتياطية: افتح التطبيق ← <b>الإعدادات ← الحساب ← حذف الحساب</b>، أو ابعت لـ <a href="mailto:hello@masareef.app">hello@masareef.app</a> بعنوان «امسح بياناتي» وهنأكدلك خلال ٤٨ ساعة.</p>'],
+      ['تواصل معانا', '<p>محتاج مساعدة في مصاريف؟ ابعتلنا على <a href="mailto:hello@getmasareef.com">hello@getmasareef.com</a>. بنقرا كل رسالة وبنرد خلال ٤٨ ساعة، بالعربي أو الإنجليزي.</p>'],
+      ['امسح حسابك وبياناتك', '<p>لأن مصاريف محلّي أولاً، مسح التطبيق بيشيل بياناتك من جهازك على طول. لمسح أي نسخة احتياطية: افتح التطبيق ← <b>الإعدادات ← الحساب ← حذف الحساب</b>، أو ابعت لـ <a href="mailto:hello@getmasareef.com">hello@getmasareef.com</a> بعنوان «امسح بياناتي» وهنأكدلك خلال ٤٨ ساعة.</p>'],
       ['إدارة اشتراكك', '<p>اشتراكات مصاريف+ بتتدار من خلال حساب Apple ID. روح <b>الإعدادات ← [اسمك] ← الاشتراكات</b> على جهازك عشان تشوف أو تغيّر أو تلغي.</p>'],
       ['أسئلة شائعة', '<p>كتير من الإجابات — البنوك المدعومة، قراءة الرسائل، الأسعار والخصوصية — موجودة في قسم الأسئلة في الصفحة الرئيسية. لسه محتاج مساعدة؟ ابعتلنا إيميل.</p>'],
     ]),
